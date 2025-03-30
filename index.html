@@ -25,7 +25,8 @@
       chat.innerHTML += `<div class='message user'>You: ${message}</div>`;
       input.value = '';
 
-      const response = await fetch('https://medical-bill-navigator-patient-rgriff-44dyp8dn6-med-course-pro.vercel.app/chat', {
+const response = await fetch('https://medical-bill-navigator-patient-rgriff-44dyp8dn6-med-course-pro.vercel.app/chat', {
+
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message })
