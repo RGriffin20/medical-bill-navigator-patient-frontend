@@ -2,26 +2,19 @@
 <html>
 <head>
   <title>Medical Bill Navigator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-image: url('https://scontent-dfw5-1.xx.fbcdn.net/v/t39.30808-6/482223883_9160278934027186_5814673962296619689_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=404ubrVctJcQ7kNvgGiMC1L&_nc_oc=AdkCTQmRZA4E16OO-atWYZZ05zbIziZWcrHu9KsGhIIEJkuF82s1OBZ1HmDL0aoKJDllkXeq6w2avMZxkQ-RHeif&_nc_zt=23&_nc_ht=scontent-dfw5-1.xx&_nc_gid=twtGIc9otubFEMZREE1smw&oh=00_AYEypDfpmCrAzw60jFaFCrlA6IgbFYt5qG9sH6q6NgJQoQ&oe=67F1A03C');
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
       margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
       padding: 20px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 12px;
+      color: #111827;
     }
     #logo {
-      display: flex;
-      justify-content: center;
+      text-align: center;
       margin-bottom: 10px;
     }
     #logo img {
@@ -29,17 +22,18 @@
     }
     h2 {
       text-align: center;
+      margin-top: 5px;
       margin-bottom: 20px;
     }
     #chat {
-      border: 1px solid #d1d5db;
-      background-color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.9);
       padding: 15px;
       border-radius: 8px;
-      height: 400px;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      margin-bottom: 10px;
+      max-height: 500px;
     }
     .message {
       margin: 10px 0;
@@ -55,6 +49,10 @@
       background-color: #f3f4f6;
       color: #1f2937;
     }
+    .typing {
+      font-style: italic;
+      color: #9ca3af;
+    }
     .starter-buttons button {
       margin: 5px 5px 0 0;
       padding: 8px 12px;
@@ -65,38 +63,48 @@
       cursor: pointer;
     }
     #userInput {
-      width: 100%;
+      width: 75%;
       padding: 12px;
       border: 1px solid #d1d5db;
       border-radius: 6px;
+      font-size: 16px;
       margin-top: 10px;
-      box-sizing: border-box;
     }
-    .send-btn {
-      padding: 10px 15px;
+    button.send-btn {
+      padding: 12px 20px;
       background-color: #1d4ed8;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      margin-top: 10px;
+      font-size: 16px;
+    }
+    @media (max-width: 600px) {
+      #userInput {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      button.send-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="logo">
-      <img src="https://images.squarespace-cdn.com/content/v1/67cdc15c698e563f85384909/0e32ff1a-3bd8-44f9-8cf9-f234dcebfb4a/MedCourse+Pro+Logo.png?format=1500w" alt="MedCourse Pro Logo">
+  <div id="logo">
+    <img src="https://images.squarespace-cdn.com/content/v1/67cdc15c698e563f85384909/0e32ff1a-3bd8-44f9-8cf9-f234dcebfb4a/MedCourse+Pro+Logo.png?format=1500w" alt="MedCourse Pro Logo">
+  </div>
+  <h2>Medical Bill Navigator</h2>
+  <div id="chat">
+    <div class="starter-buttons">
+      <button onclick="presetMessage('Can you help me understand my medical bill?')">Can you help me understand my medical bill?</button>
+      <button onclick="presetMessage('What can I do if I can\'t pay my bill?')">What can I do if I can't pay my bill?</button>
+      <button onclick="presetMessage('Ask me a question about your medical bill.')">Ask me a question about your medical bill.</button>
+      <button onclick="presetMessage('Use the companion guide to help you.')">Use the companion guide to help you.</button>
     </div>
-    <h2>Medical Bill Navigator</h2>
-    <div id="chat">
-      <div class="starter-buttons">
-        <button onclick="presetMessage('Can you help me understand my medical bill?')">Can you help me understand my medical bill?</button>
-        <button onclick="presetMessage('What can I do if I can\'t pay my bill?')">What can I do if I can't pay my bill?</button>
-        <button onclick="presetMessage('Ask me a question about your medical bill.')">Ask me a question about your medical bill.</button>
-        <button onclick="presetMessage('Use the companion guide to help you.')">Use the companion guide to help you.</button>
-      </div>
-    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 10px;">
     <input type="text" id="userInput" placeholder="Type your message here...">
     <button class="send-btn" onclick="sendMessage()">Send</button>
   </div>
@@ -114,9 +122,16 @@
     async function sendMessage() {
       const message = input.value.trim();
       if (!message) return;
+
       appendMessage('You', message, 'user');
       input.value = '';
       messageHistory.push({ role: 'user', content: message });
+
+      const typing = document.createElement('div');
+      typing.className = 'message typing';
+      typing.textContent = 'Navigator is typing...';
+      chat.appendChild(typing);
+      chat.scrollTop = chat.scrollHeight;
 
       try {
         const response = await fetch('https://medical-bill-navigator-patient-backend.vercel.app/api/chat', {
@@ -125,12 +140,15 @@
           body: JSON.stringify({ messages: messageHistory })
         });
 
+        chat.removeChild(typing);
+
         if (!response.ok) throw new Error('Network response was not OK');
 
         const data = await response.json();
         messageHistory.push({ role: 'assistant', content: data.reply });
         appendMessage('Navigator', data.reply, 'bot');
       } catch (error) {
+        chat.removeChild(typing);
         appendMessage('Error', error.message, 'bot');
       }
 
