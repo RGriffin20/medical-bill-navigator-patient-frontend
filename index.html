@@ -3,34 +3,44 @@
 <head>
   <title>Medical Bill Navigator</title>
   <style>
-   body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-image: url('https://scontent-dfw5-1.xx.fbcdn.net/v/t39.30808-6/482223883_9160278934027186_5814673962296619689_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=404ubrVctJcQ7kNvgGiMC1L&_nc_oc=AdkCTQmRZA4E16OO-atWYZZ05zbIziZWcrHu9KsGhIIEJkuF82s1OBZ1HmDL0aoKJDllkXeq6w2avMZxkQ-RHeif&_nc_zt=23&_nc_ht=scontent-dfw5-1.xx&_nc_gid=twtGIc9otubFEMZREE1smw&oh=00_AYEypDfpmCrAzw60jFaFCrlA6IgbFYt5qG9sH6q6NgJQoQ&oe=67F1A03C');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  color: #111827;
-  max-width: 700px;
-  margin: 40px auto;
-  padding: 20px;
-}
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('https://scontent-dfw5-1.xx.fbcdn.net/v/t39.30808-6/482223883_9160278934027186_5814673962296619689_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=404ubrVctJcQ7kNvgGiMC1L&_nc_oc=AdkCTQmRZA4E16OO-atWYZZ05zbIziZWcrHu9KsGhIIEJkuF82s1OBZ1HmDL0aoKJDllkXeq6w2avMZxkQ-RHeif&_nc_zt=23&_nc_ht=scontent-dfw5-1.xx&_nc_gid=twtGIc9otubFEMZREE1smw&oh=00_AYEypDfpmCrAzw60jFaFCrlA6IgbFYt5qG9sH6q6NgJQoQ&oe=67F1A03C');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+    }
     #logo {
       display: flex;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     #logo img {
       height: 80px;
     }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
     #chat {
       border: 1px solid #d1d5db;
-      background-color: rgba(255, 255, 255, 0.9); /* semi-transparent white */;
+      background-color: #ffffff;
       padding: 15px;
       border-radius: 8px;
-      height: 500px;
+      height: 400px;
       overflow-y: auto;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
       margin-bottom: 10px;
+    }
     .message {
       margin: 10px 0;
       padding: 10px;
@@ -55,39 +65,41 @@
       cursor: pointer;
     }
     #userInput {
-      width: 80%;
-      padding: 10px;
+      width: 100%;
+      padding: 12px;
       border: 1px solid #d1d5db;
       border-radius: 6px;
       margin-top: 10px;
+      box-sizing: border-box;
     }
-    button.send-btn {
+    .send-btn {
       padding: 10px 15px;
       background-color: #1d4ed8;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div id="logo">
-    <img src="https://images.squarespace-cdn.com/content/v1/67cdc15c698e563f85384909/0e32ff1a-3bd8-44f9-8cf9-f234dcebfb4a/MedCourse+Pro+Logo.png?format=1500w" alt="MedCourse Pro Logo">
-  </div>
-
-  <h2>Medical Bill Navigator</h2>
-  <div id="chat">
-    <div class="starter-buttons">
-      <button onclick="presetMessage('Can you help me understand my medical bill?')">Can you help me understand my medical bill?</button>
-      <button onclick="presetMessage('What can I do if I can\'t pay my bill?')">What can I do if I can't pay my bill?</button>
-      <button onclick="presetMessage('Ask me a question about your medical bill.')">Ask me a question about your medical bill.</button>
-      <button onclick="presetMessage('Use the companion guide to help you.')">Use the companion guide to help you.</button>
+  <div class="container">
+    <div id="logo">
+      <img src="https://images.squarespace-cdn.com/content/v1/67cdc15c698e563f85384909/0e32ff1a-3bd8-44f9-8cf9-f234dcebfb4a/MedCourse+Pro+Logo.png?format=1500w" alt="MedCourse Pro Logo">
     </div>
+    <h2>Medical Bill Navigator</h2>
+    <div id="chat">
+      <div class="starter-buttons">
+        <button onclick="presetMessage('Can you help me understand my medical bill?')">Can you help me understand my medical bill?</button>
+        <button onclick="presetMessage('What can I do if I can\'t pay my bill?')">What can I do if I can't pay my bill?</button>
+        <button onclick="presetMessage('Ask me a question about your medical bill.')">Ask me a question about your medical bill.</button>
+        <button onclick="presetMessage('Use the companion guide to help you.')">Use the companion guide to help you.</button>
+      </div>
+    </div>
+    <input type="text" id="userInput" placeholder="Type your message here...">
+    <button class="send-btn" onclick="sendMessage()">Send</button>
   </div>
-
-  <input type="text" id="userInput" placeholder="Type your message here...">
-  <button class="send-btn" onclick="sendMessage()">Send</button>
 
   <script>
     const chat = document.getElementById('chat');
@@ -140,7 +152,7 @@
     function formatMarkdown(text) {
       return text
         .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
         .replace(/^\d+\. (.*$)/gim, '<p>$1</p>')
         .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
         .replace(/\n/g, '<br>');
@@ -148,4 +160,3 @@
   </script>
 </body>
 </html>
-
