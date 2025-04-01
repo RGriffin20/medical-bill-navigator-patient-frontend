@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medical Bill Navigator</title>
   <style>
     body {
@@ -152,104 +153,38 @@
   </div>
 
   <script>
-  const chat = document.getElementById('chat');
-  const input = document.getElementById('userInput');
-  const messageHistory = [
-    {
-      role: 'system',
-      content: `You are the user's Medical Bill Navigator. Be clear, kind, and helpful. Speak at a 6th-grade reading level. Format your responses with clear headings using <h3>, short paragraphs in <p>, and numbered or bulleted lists with <ol> or <ul> as needed.`
-    }
-  ];
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('userInput');
+    const messageHistory = [
+      {
+        role: 'system',
+        content: `You are the user's Medical Bill Navigator. Be clear, kind, and helpful. Speak at a 6th-grade reading level. Format your responses with clear headings using <h3>, short paragraphs in <p>, and numbered or bulleted lists with <ol> or <ul> as needed.`
+      }
+    ];
 
-  async function sendMessage() {
-    const message = input.value.trim();
-    if (!message) return;
-
-    addMessage('You', message, 'user');
-    input.value = '';
-    messageHistory.push({ role: 'user', content: message });
-
-    showTyping();
-
-    try {
-      const response = await fetch('https://medical-bill-navigator-patient-backend.vercel.app/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: messageHistory })
-      });
-
-      if (!response.ok) throw new Error('Network response was not OK');
-
-      const data = await response.json();
-      messageHistory.push({ role: 'assistant', content: data.reply });
-
-      removeTyping();
-      await typeMessage('Navigator', data.reply, 'bot');
-    } catch (error) {
-      removeTyping();
-      addMessage('Error', error.message, 'bot');
+    function presetMessage(text) {
+      input.value = text;
+      sendMessage();
     }
 
-    chat.scrollTop = chat.scrollHeight;
-  }
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
 
-  function presetMessage(text) {
-    input.value = text;
-    sendMessage();
-  }
+      addMessage('You', message, 'user');
+      input.value = '';
+      messageHistory.push({ role: 'user', content: message });
 
-  function addMessage(sender, text, type) {
-    const msg = document.createElement('div');
-    msg.className = `message ${type}`;
-    msg.innerHTML = `<strong>${sender}:</strong><br>${formatMarkdown(text)}`;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-  }
+      try {
+        const response = await fetch('https://medical-bill-navigator-patient-backend.vercel.app/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: messageHistory })
+        });
 
-  async function typeMessage(sender, text, type) {
-    const msg = document.createElement('div');
-    msg.className = `message ${type}`;
-    msg.innerHTML = `<strong>${sender}:</strong><br><span id="typingText"></span>`;
-    chat.appendChild(msg);
+        if (!response.ok) throw new Error('Network response was not OK');
 
-    const typingText = msg.querySelector('#typingText');
-    const markdownText = formatMarkdown(text).replace(/<br>/g, '\n'); // Temporarily revert <br> to newlines
+        const data = await response.json();
+        messageHistory.push({ role: 'assistant', content: data.reply });
+        add
 
-    let i = 0;
-    const delay = 10; // typing speed
-
-    while (i < markdownText.length) {
-      typingText.textContent += markdownText[i++];
-      chat.scrollTop = chat.scrollHeight;
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-
-    // After typing, parse markdown to HTML
-    typingText.innerHTML = formatMarkdown(typingText.textContent);
-  }
-
-  function showTyping() {
-    const typing = document.createElement('div');
-    typing.className = 'message bot';
-    typing.id = 'typing';
-    typing.innerHTML = '<em>Navigator is typing...</em>';
-    chat.appendChild(typing);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  function removeTyping() {
-    const typing = document.getElementById('typing');
-    if (typing) typing.remove();
-  }
-
-  function formatMarkdown(text) {
-    return text
-      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-      .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-      .replace(/\d+\.\s(.*)/g, '<p>$1</p>')
-      .replace(/\* (.*)/g, '<ul><li>$1</li></ul>')
-      .replace(/\n/g, '<br>');
-  }
-</script>
-</body>
-</html>
