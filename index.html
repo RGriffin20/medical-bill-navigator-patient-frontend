@@ -156,7 +156,17 @@
            class="download-btn">Download the Guide</a>
       </div>
     </div>
-    <!-- The rest of the HTML remains unchanged -->
+
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message here..." />
+      <button class="send-btn" id="sendBtn">Send</button>
+    </div>
+
+    <div id="fileUpload">
+      <label for="fileInput">Upload your EOB or bill (PDF, JPG, PNG):</label><br />
+      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" />
+      <div id="fileLabel"></div>
+    </div>
   </div>
 </body>
 </html>
