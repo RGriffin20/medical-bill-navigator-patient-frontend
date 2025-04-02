@@ -75,7 +75,7 @@
     }
 
     .starter-buttons button,
-    .starter-buttons a.download-btn {
+    .download-btn {
       margin: 5px;
       padding: 8px 12px;
       background-color: #1d4ed8;
@@ -83,9 +83,6 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 14px;
     }
 
     .input-area {
@@ -150,10 +147,6 @@
         <button id="btn3">Ask me a question about your medical bill.</button>
         <button id="btn4">Use the companion guide to help you.</button>
         <button class="download-btn" onclick="downloadChat()">Download Chat</button>
-        <a href="https://drive.google.com/file/d/1RSOOtw92iLKSb5oyHWhyUJ4MdBpak__A/view?usp=sharing" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           class="download-btn">Download the Guide</a>
       </div>
     </div>
 
@@ -168,5 +161,143 @@
       <div id="fileLabel"></div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const chat = document.getElementById('chat');
+      const input = document.getElementById('userInput');
+      const fileInput = document.getElementById('fileInput');
+      const fileLabel = document.getElementById('fileLabel');
+      const messageHistory = [
+        {
+          role: 'system',
+          content: You are the user's Medical Bill Navigator. Be clear, kind, and helpful. Speak at a 6th-grade reading level. Format responses with <h3> for headings, short <p> paragraphs, and bullet/numbered lists as needed.
+        }
+      ];
+
+      let typingInterval;
+
+      function showTyping() {
+        const typing = document.createElement("div");
+        typing.id = "typingIndicator";
+        typing.className = "message bot";
+        typing.innerHTML = "<em>Navigator is typing<span id='dots'></span></em>";
+        chat.appendChild(typing);
+        chat.scrollTop = chat.scrollHeight;
+
+        let dotCount = 0;
+        typingInterval = setInterval(() => {
+          const dots = document.getElementById("dots");
+          if (dots) {
+            dots.textContent = ".".repeat((dotCount % 3) + 1);
+            dotCount++;
+          }
+        }, 500);
+      }
+
+      function removeTyping() {
+        clearInterval(typingInterval);
+        const typing = document.getElementById("typingIndicator");
+        if (typing) typing.remove();
+      }
+
+      function vibrateIfActive() {
+        if (document.hasFocus() && "vibrate" in navigator) {
+          navigator.vibrate(100);
+        }
+      }
+
+      async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
+
+        addMessage("You", message, "user");
+        input.value = "";
+        messageHistory.push({ role: "user", content: message });
+
+        showTyping();
+
+        try {
+          const response = await fetch("https://medical-bill-navigator-patient-backend.vercel.app/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messages: messageHistory }),
+          });
+
+          if (!response.ok) throw new Error("Network response was not OK");
+
+          const data = await response.json();
+
+          await new Promise(resolve => setTimeout(resolve, 500)); // slight delay
+          removeTyping();
+          vibrateIfActive();
+
+          messageHistory.push({ role: "assistant", content: data.reply });
+          addMessage("Navigator", data.reply, "bot");
+        } catch (error) {
+          removeTyping();
+          addMessage("Error", error.message, "bot");
+        }
+
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      function presetMessage(text) {
+        input.value = text;
+        sendMessage();
+      }
+
+      function addMessage(sender, text, type) {
+        const msg = document.createElement("div");
+        msg.className = message ${type};
+        msg.innerHTML = <strong>${sender}:</strong><br>${formatMarkdown(text)};
+        chat.appendChild(msg);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      function formatMarkdown(text) {
+        return text
+          .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+          .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+          .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+          .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/gim, "<em>$1</em>")
+          .replace(/^- (.*$)/gim, "<ul><li>$1</li></ul>")
+          .replace(/\n/g, "<br>");
+      }
+
+      document.getElementById('btn1').onclick = () => presetMessage('Can you help me understand my medical bill?');
+      document.getElementById('btn2').onclick = () => presetMessage("What can I do if I can't pay my bill?");
+      document.getElementById('btn3').onclick = () => presetMessage("Ask me a question about your medical bill.");
+      document.getElementById('btn4').onclick = () => presetMessage("Use the companion guide to help you.");
+      document.getElementById('sendBtn').onclick = sendMessage;
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        fileLabel.textContent = file ? Uploaded: ${file.name} : '';
+        if (file) {
+          addMessage("You", Uploaded file: ${file.name}, "user");
+        }
+      });
+    });
+
+    function downloadChat() {
+      const messages = document.querySelectorAll(".message");
+      let chatContent = "Medical Bill Navigator Chat\n\n";
+
+      messages.forEach((msg) => {
+        const text = msg.innerText || msg.textContent;
+        chatContent += text + "\n\n";
+      });
+
+      const blob = new Blob([chatContent], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "medical-bill-chat.txt";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
 </body>
 </html>
