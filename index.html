@@ -5,8 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medical Bill Navigator</title>
   <style>
-    /* [unchanged CSS — your full style block is preserved] */
-    /* ... */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('https://images.squarespace-cdn.com/content/v1/67cdc15c698e563f85384909/8ff33047-7b2b-4e9b-8c02-2ca6003ee587/MedCourse+Pro+Background+Image.jpg?format=500w');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    #logo {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #logo img {
+      height: 70px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 5px;
+      color: #1f2937;
+    }
+
+    #chat {
+      border: 1px solid #d1d5db;
+      background-color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      height: 400px;
+      overflow-y: auto;
+      margin: 10px 0;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      line-height: 1.5;
+    }
+
+    .user {
+      background-color: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .bot {
+      background-color: #f3f4f6;
+      color: #1f2937;
+    }
+
+    .starter-buttons {
+      text-align: center;
+    }
+
+    .starter-buttons button,
+    .download-btn {
+      margin: 5px;
+      padding: 8px 12px;
+      background-color: #1d4ed8;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .input-area {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    #userInput {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px 0 0 6px;
+    }
+
+    button.send-btn {
+      padding: 12px 18px;
+      background-color: #1d4ed8;
+      color: white;
+      border: none;
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+    }
+
+    #fileUpload {
+      margin-top: 10px;
+    }
+
+    #fileLabel {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    @media (max-width: 600px) {
+      .input-area {
+        flex-direction: column;
+      }
+
+      #userInput {
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+
+      button.send-btn {
+        border-radius: 6px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -40,7 +165,7 @@
 
   <script>
     let typingInterval;
-    let lastLetter = '';
+    let lastLetter = "";
 
     function showTyping() {
       const chat = document.getElementById("chat");
@@ -79,6 +204,7 @@
       const fileInput = document.getElementById('fileInput');
       const fileLabel = document.getElementById('fileLabel');
       const downloadBtn = document.getElementById('downloadLetterBtn');
+
       const messageHistory = [
         {
           role: 'system',
@@ -106,7 +232,7 @@
           const response = await fetch("/api/download", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ letter: lastLetter }),
+            body: JSON.stringify({ letterContent: lastLetter }),
           });
           if (!response.ok) throw new Error("Failed to generate letter");
 
@@ -155,7 +281,7 @@
           messageHistory.push({ role: "assistant", content: data.reply });
           addMessage("Navigator", data.reply, "bot");
 
-          if (/^dear\b/i.test(data.reply) && /appeal|denial|claim/i.test(data.reply)) {
+          if (/^dear/i.test(data.reply) && /appeal|denial|claim/i.test(data.reply)) {
             lastLetter = data.reply;
             downloadBtn.style.display = "inline-block";
           }
@@ -207,3 +333,4 @@
   </script>
 </body>
 </html>
+
