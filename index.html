@@ -281,10 +281,10 @@ const response = await fetch("https://medical-bill-navigator-patient-backend.ver
           messageHistory.push({ role: "assistant", content: data.reply });
           addMessage("Navigator", data.reply, "bot");
 
-          if (/^dear/i.test(data.reply) && /appeal|denial|claim/i.test(data.reply)) {
-            lastLetter = data.reply;
-            downloadBtn.style.display = "inline-block";
-          }
+          if (data.offerDownload) {
+  lastLetter = data.reply;
+  downloadBtn.style.display = "inline-block";
+}
         } catch (error) {
           removeTyping();
           addMessage("Error", error.message, "bot");
