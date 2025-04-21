@@ -229,7 +229,7 @@
       downloadBtn.addEventListener('click', async () => {
         if (!lastLetter) return alert("No letter to download yet.");
         try {
-          const response = await fetch("/api/download", {
+const response = await fetch("https://medical-bill-navigator-patient-backend.vercel.app/api/download", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ letterContent: lastLetter }),
