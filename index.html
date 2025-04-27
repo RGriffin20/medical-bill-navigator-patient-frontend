@@ -186,6 +186,7 @@
       padding: 15px;
       border-radius: 12px;
       border: 1px solid #e0e0e0;
+      margin-bottom: 20px;
     }
 
     #fileInput {
@@ -207,19 +208,16 @@
     }
 
     .resource-buttons {
-      margin-top: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      display: none; /* Hide on desktop as we're moving these to side panel */
     }
 
     .resource-button {
       display: flex;
       align-items: center;
-      padding: 12px;
+      padding: 16px;
       background-color: white;
       border: 1px solid #e0e0e0;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s;
       text-align: left;
@@ -236,9 +234,11 @@
     }
 
     .resource-button .icon {
-      margin-right: 10px;
-      font-size: 20px;
+      margin-right: 15px;
+      font-size: 24px;
       color: #4a90e2;
+      min-width: 30px;
+      text-align: center;
     }
 
     @media (max-width: 768px) {
@@ -326,13 +326,21 @@
         width: 100%;
       }
 
+      /* Show resource buttons in mobile view */
       .resource-buttons {
+        display: flex;
         flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
       }
 
       .resource-button {
         padding: 10px;
         font-size: 14px;
+      }
+      
+      .resource-button .icon {
+        margin-right: 10px;
       }
     }
   </style>
@@ -365,6 +373,19 @@
           <div class="icon">⬇️</div>
           Download Chat
         </button>
+        <!-- Add resource buttons to side panel for desktop view -->
+        <a href="https://designrr.page/?id=445080&token=2453377749&h=3860" target="_blank" class="side-button resource-button">
+          <div class="icon">📚</div>
+          Step-By-Step Guidebook
+        </a>
+        <a href="https://chatgpt.com/g/g-6776bef0fe8c8191acf9cd24f6b7144a-medical-bill-navigator" target="_blank" class="side-button resource-button">
+          <div class="icon">🤖</div>
+          Navigator Powered by ChatGPT
+        </a>
+        <a href="https://designrr.page/?id=456931&token=384796273&h=2848" target="_blank" class="side-button resource-button">
+          <div class="icon">💬</div>
+          Chat Companion
+        </a>
       </div>
 
       <div class="chat-section">
@@ -390,7 +411,7 @@
           <div id="fileLabel"></div>
         </div>
 
-        <!-- New Resource Buttons -->
+        <!-- Mobile-only resource buttons -->
         <div class="resource-buttons">
           <a href="https://designrr.page/?id=445080&token=2453377749&h=3860" target="_blank" class="resource-button">
             <div class="icon">📚</div>
