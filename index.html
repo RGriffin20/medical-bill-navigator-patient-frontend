@@ -66,7 +66,7 @@
     .main-content {
       display: flex;
       gap: 20px;
-      height: 500px;
+      min-height: 500px;
     }
 
     .chat-section {
@@ -83,6 +83,7 @@
       border-radius: 12px;
       overflow-y: auto;
       margin-bottom: 10px;
+      min-height: 300px;
     }
 
     .message {
@@ -207,8 +208,9 @@
       background-color: #4CAF50;
     }
 
+    /* Hide resource buttons in desktop view since they're in the side panel */
     .resource-buttons {
-      display: none; /* Hide on desktop as we're moving these to side panel */
+      display: none;
     }
 
     .resource-button {
@@ -276,23 +278,44 @@
         height: 300px;
       }
 
+      /* Hide desktop side-buttons and show only the mobile ones */
       .side-buttons {
+        display: none;
+      }
+
+      /* Show a grid of buttons at the top in mobile view */
+      .mobile-buttons {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
+        margin-bottom: 15px;
       }
 
-      .side-button {
+      .mobile-button {
         padding: 10px;
         font-size: 14px;
+        display: flex;
         flex-direction: column;
+        align-items: center;
         text-align: center;
-        width: auto;
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       }
 
-      .side-button .icon {
-        margin-right: 0;
+      .mobile-button:hover {
+        background-color: #f5f8ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+
+      .mobile-button .icon {
         margin-bottom: 5px;
+        font-size: 24px;
+        color: #4a90e2;
       }
 
       .input-area {
@@ -326,7 +349,7 @@
         width: 100%;
       }
 
-      /* Show resource buttons in mobile view */
+      /* Show resource buttons in mobile view at the bottom */
       .resource-buttons {
         display: flex;
         flex-direction: column;
@@ -355,6 +378,26 @@
       <div class="title">MEDICAL BILL NAVIGATOR FOR PATIENTS</div>
     </div>
 
+    <!-- Mobile-only buttons that appear at the top -->
+    <div class="mobile-buttons">
+      <button class="mobile-button" id="mobileDownloadAppealBtn">
+        <div class="icon">📄</div>
+        Download Appeal
+      </button>
+      <button class="mobile-button" id="mobileHelpUnderstandBtn">
+        <div class="icon">❓</div>
+        Help Me Understand
+      </button>
+      <button class="mobile-button" id="mobileStepByStepBtn">
+        <div class="icon">📋</div>
+        Step-by-Step Guide
+      </button>
+      <button class="mobile-button" id="mobileDownloadChatBtn">
+        <div class="icon">⬇️</div>
+        Download Chat
+      </button>
+    </div>
+
     <div class="main-content">
       <div class="side-buttons">
         <button class="side-button" id="downloadAppealBtn">
@@ -369,11 +412,11 @@
           <div class="icon">📋</div>
           Use Step-by-Step Guide
         </button>
-        <button class="side-button" onclick="downloadChat()">
+        <button class="side-button" id="downloadChatBtn">
           <div class="icon">⬇️</div>
           Download Chat
         </button>
-        <!-- Add resource buttons to side panel for desktop view -->
+        <!-- Resource buttons in side panel for desktop view -->
         <a href="https://designrr.page/?id=445080&token=2453377749&h=3860" target="_blank" class="side-button resource-button">
           <div class="icon">📚</div>
           Step-By-Step Guidebook
@@ -411,7 +454,7 @@
           <div id="fileLabel"></div>
         </div>
 
-        <!-- Mobile-only resource buttons -->
+        <!-- Mobile-only resource buttons at the bottom -->
         <div class="resource-buttons">
           <a href="https://designrr.page/?id=445080&token=2453377749&h=3860" target="_blank" class="resource-button">
             <div class="icon">📚</div>
@@ -474,6 +517,12 @@
       const downloadAppealBtn = document.getElementById('downloadAppealBtn');
       const helpUnderstandBtn = document.getElementById('helpUnderstandBtn');
       const stepByStepBtn = document.getElementById('stepByStepBtn');
+      
+      // Mobile buttons
+      const mobileDownloadAppealBtn = document.getElementById('mobileDownloadAppealBtn');
+      const mobileHelpUnderstandBtn = document.getElementById('mobileHelpUnderstandBtn');
+      const mobileStepByStepBtn = document.getElementById('mobileStepByStepBtn');
+      const mobileDownloadChatBtn = document.getElementById('mobileDownloadChatBtn');
 
       const messageHistory = [
         {
@@ -493,17 +542,49 @@
       
       document.getElementById('sendBtn').onclick = sendMessage;
       
-      // Side buttons functionality
-      downloadAppealBtn.onclick = () => {
-        if (lastLetter) {
-          downloadLetter();
-        } else {
-          presetMessage("I need help writing an appeal letter");
-        }
-      };
+      // Side buttons functionality for desktop
+      if (downloadAppealBtn) {
+        downloadAppealBtn.onclick = () => {
+          if (lastLetter) {
+            downloadLetter();
+          } else {
+            presetMessage("I need help writing an appeal letter");
+          }
+        };
+      }
       
-      helpUnderstandBtn.onclick = () => presetMessage("Help me understand my claim");
-      stepByStepBtn.onclick = () => presetMessage("Use the step-by-step guide to help you");
+      if (helpUnderstandBtn) {
+        helpUnderstandBtn.onclick = () => presetMessage("Help me understand my claim");
+      }
+      
+      if (stepByStepBtn) {
+        stepByStepBtn.onclick = () => presetMessage("Use the step-by-step guide to help you");
+      }
+      
+      document.getElementById('downloadChatBtn').onclick = downloadChat;
+      
+      // Mobile buttons functionality
+      if (mobileDownloadAppealBtn) {
+        mobileDownloadAppealBtn.onclick = () => {
+          if (lastLetter) {
+            downloadLetter();
+          } else {
+            presetMessage("I need help writing an appeal letter");
+          }
+        };
+      }
+      
+      if (mobileHelpUnderstandBtn) {
+        mobileHelpUnderstandBtn.onclick = () => presetMessage("Help me understand my claim");
+      }
+      
+      if (mobileStepByStepBtn) {
+        mobileStepByStepBtn.onclick = () => presetMessage("Use the step-by-step guide to help you");
+      }
+      
+      if (mobileDownloadChatBtn) {
+        mobileDownloadChatBtn.onclick = downloadChat;
+      }
 
       // Add Enter key press functionality for better UX
       input.addEventListener('keypress', function(e) {
@@ -651,6 +732,26 @@
       link.click();
       URL.revokeObjectURL(url);
     }
+
+    // Handle mobile/desktop view automatically
+    function handleViewportChange() {
+      const mobileButtons = document.querySelector('.mobile-buttons');
+      const sideButtons = document.querySelector('.side-buttons');
+      
+      if (window.innerWidth <= 768) {
+        if (mobileButtons) mobileButtons.style.display = 'grid';
+        if (sideButtons) sideButtons.style.display = 'none';
+      } else {
+        if (mobileButtons) mobileButtons.style.display = 'none';
+        if (sideButtons) sideButtons.style.display = 'flex';
+      }
+    }
+
+    // Run on page load
+    handleViewportChange();
+    
+    // Run when window is resized
+    window.addEventListener('resize', handleViewportChange);
   </script>
 </body>
 </html>
