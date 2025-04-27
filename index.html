@@ -164,6 +164,8 @@
       text-align: left;
       font-weight: 500;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      text-decoration: none;
+      color: inherit;
     }
 
     .side-button:hover {
@@ -202,6 +204,48 @@
       display: none;
     }
 
+    .external-link {
+      color: inherit;
+      text-decoration: none;
+      width: 100%;
+    }
+
+    /* Mobile floating buttons */
+    .mobile-buttons {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .mobile-button-container {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .mobile-button {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      font-weight: 500;
+      color: #4a90e2;
+      text-decoration: none;
+      display: block;
+    }
+
+    .mobile-button:last-child {
+      border-bottom: none;
+    }
+
+    #downloadLetterBtn {
+      background-color: #4CAF50;
+    }
+
     @media (max-width: 768px) {
       .main-content {
         flex-direction: column-reverse;
@@ -210,15 +254,44 @@
       
       .side-buttons {
         margin-bottom: 20px;
+        display: none; /* Hide sidebar buttons on mobile */
+      }
+      
+      .mobile-buttons {
+        display: block; /* Show mobile buttons on small screens */
       }
       
       .message {
         max-width: 90%;
       }
-    }
-
-    #downloadLetterBtn {
-      background-color: #4CAF50;
+      
+      .container {
+        padding: 15px;
+        height: calc(100vh - 40px);
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        text-align: center;
+      }
+      
+      .title {
+        font-size: 18px;
+      }
+      
+      body {
+        padding: 10px;
+      }
+      
+      .chat-section {
+        height: calc(100vh - 200px);
+      }
+      
+      #chat {
+        height: calc(100vh - 300px);
+      }
     }
   </style>
 </head>
@@ -274,7 +347,32 @@
           <div class="icon">📋</div>
           Use Step-by-Step Guide
         </button>
+        <a href="https://designrr.page/?id=445080&token=2453377749&h=3860" target="_blank" class="side-button external-link">
+          <div class="icon">📘</div>
+          Step-By-Step Guide Book
+        </a>
+        <a href="https://chatgpt.com/g/g-6776bef0fe8c8191acf9cd24f6b7144a-medical-bill-navigator" target="_blank" class="side-button external-link">
+          <div class="icon">💬</div>
+          Patient Navigator Powered by ChatGPT
+        </a>
+        <a href="https://designrr.page/?id=456931&token=384796273&h=2848" target="_blank" class="side-button external-link">
+          <div class="icon">📚</div>
+          Patient Navigator Companion Guide
+        </a>
       </div>
+    </div>
+  </div>
+
+  <!-- Mobile floating buttons -->
+  <div class="mobile-buttons">
+    <div class="mobile-button-container">
+      <a href="#" class="mobile-button" onclick="downloadChat(); return false;">Download Chat</a>
+      <a href="#" class="mobile-button" id="mobileDownloadAppealBtn">Download Appeal</a>
+      <a href="#" class="mobile-button" id="mobileHelpUnderstandBtn">Help Me Understand My Claim</a>
+      <a href="#" class="mobile-button" id="mobileStepByStepBtn">Use Step-by-Step Guide</a>
+      <a href="https://designrr.page/?id=445080&token=2453377749&h=3860" target="_blank" class="mobile-button">Step-By-Step Guide Book</a>
+      <a href="https://chatgpt.com/g/g-6776bef0fe8c8191acf9cd24f6b7144a-medical-bill-navigator" target="_blank" class="mobile-button">Patient Navigator Powered by ChatGPT</a>
+      <a href="https://designrr.page/?id=456931&token=384796273&h=2848" target="_blank" class="mobile-button">Patient Navigator Companion Guide</a>
     </div>
   </div>
 
@@ -322,6 +420,11 @@
       const downloadAppealBtn = document.getElementById('downloadAppealBtn');
       const helpUnderstandBtn = document.getElementById('helpUnderstandBtn');
       const stepByStepBtn = document.getElementById('stepByStepBtn');
+      
+      // Mobile buttons
+      const mobileDownloadAppealBtn = document.getElementById('mobileDownloadAppealBtn');
+      const mobileHelpUnderstandBtn = document.getElementById('mobileHelpUnderstandBtn');
+      const mobileStepByStepBtn = document.getElementById('mobileStepByStepBtn');
 
       const messageHistory = [
         {
@@ -347,6 +450,26 @@
       
       helpUnderstandBtn.onclick = () => presetMessage("Help me understand my claim");
       stepByStepBtn.onclick = () => presetMessage("Use the step-by-step guide to help you");
+      
+      // Mobile buttons functionality
+      mobileDownloadAppealBtn.onclick = () => {
+        if (lastLetter) {
+          downloadLetter();
+        } else {
+          presetMessage("I need help writing an appeal letter");
+        }
+        return false;
+      };
+      
+      mobileHelpUnderstandBtn.onclick = () => {
+        presetMessage("Help me understand my claim");
+        return false;
+      };
+      
+      mobileStepByStepBtn.onclick = () => {
+        presetMessage("Use the step-by-step guide to help you");
+        return false;
+      };
 
       fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -463,6 +586,13 @@
       setTimeout(() => {
         addMessage("Navigator", "Hello! I'm your Medical Bill Navigator. How can I help you today?", "bot");
       }, 500);
+      
+      // Listen for keyboard events
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
     });
 
     function downloadChat() {
