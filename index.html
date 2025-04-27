@@ -202,23 +202,66 @@
       display: none;
     }
 
+    #downloadLetterBtn {
+      background-color: #4CAF50;
+    }
+
+    /* Fixed mobile styles */
     @media (max-width: 768px) {
       .main-content {
-        flex-direction: column-reverse;
+        flex-direction: column;
         height: auto;
       }
       
       .side-buttons {
         margin-bottom: 20px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+      
+      .side-button {
+        width: 48%;
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 14px;
+      }
+      
+      .side-button .icon {
+        margin-right: 8px;
+        font-size: 18px;
       }
       
       .message {
         max-width: 90%;
       }
-    }
-
-    #downloadLetterBtn {
-      background-color: #4CAF50;
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .title {
+        font-size: 18px;
+        margin-top: 10px;
+      }
+      
+      .input-area {
+        display: flex;
+        width: 100%;
+      }
+      
+      button.send-btn {
+        padding: 0 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 60px;
+      }
+      
+      #chat {
+        height: 300px;
+      }
     }
   </style>
 </head>
@@ -233,6 +276,25 @@
     </div>
 
     <div class="main-content">
+      <div class="side-buttons">
+        <button class="side-button" onclick="downloadChat()">
+          <div class="icon">⬇️</div>
+          Download Chat
+        </button>
+        <button class="side-button" id="downloadAppealBtn">
+          <div class="icon">📄</div>
+          Download Appeal
+        </button>
+        <button class="side-button" id="helpUnderstandBtn">
+          <div class="icon">❓</div>
+          Help Me Understand My Claim
+        </button>
+        <button class="side-button" id="stepByStepBtn">
+          <div class="icon">📋</div>
+          Use Step-by-Step Guide
+        </button>
+      </div>
+
       <div class="chat-section">
         <div id="chat">
           <!-- Chat messages will appear here -->
@@ -255,25 +317,6 @@
           <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" />
           <div id="fileLabel"></div>
         </div>
-      </div>
-
-      <div class="side-buttons">
-        <button class="side-button" onclick="downloadChat()">
-          <div class="icon">⬇️</div>
-          Download Chat
-        </button>
-        <button class="side-button" id="downloadAppealBtn">
-          <div class="icon">📄</div>
-          Download Appeal
-        </button>
-        <button class="side-button" id="helpUnderstandBtn">
-          <div class="icon">❓</div>
-          Help Me Understand My Claim
-        </button>
-        <button class="side-button" id="stepByStepBtn">
-          <div class="icon">📋</div>
-          Use Step-by-Step Guide
-        </button>
       </div>
     </div>
   </div>
@@ -330,10 +373,14 @@
         }
       ];
 
-      document.getElementById('btn1').onclick = () => presetMessage('Can you help me understand my medical bill?');
-      document.getElementById('btn2').onclick = () => presetMessage("What can I do if I can't pay my bill?");
-      document.getElementById('btn3').onclick = () => presetMessage("Ask me a question about your medical bill.");
-      document.getElementById('btn4').onclick = () => presetMessage("Use the step-by-step guide to help you.");
+      // Ensure buttons exist before adding event listeners
+      if (document.getElementById('btn1')) {
+        document.getElementById('btn1').onclick = () => presetMessage('Can you help me understand my medical bill?');
+        document.getElementById('btn2').onclick = () => presetMessage("What can I do if I can't pay my bill?");
+        document.getElementById('btn3').onclick = () => presetMessage("Ask me a question about your medical bill.");
+        document.getElementById('btn4').onclick = () => presetMessage("Use the step-by-step guide to help you.");
+      }
+      
       document.getElementById('sendBtn').onclick = sendMessage;
       
       // Side buttons functionality
@@ -347,6 +394,13 @@
       
       helpUnderstandBtn.onclick = () => presetMessage("Help me understand my claim");
       stepByStepBtn.onclick = () => presetMessage("Use the step-by-step guide to help you");
+
+      // Add Enter key press functionality for better UX
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
 
       fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
