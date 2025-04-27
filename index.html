@@ -206,61 +206,89 @@
       background-color: #4CAF50;
     }
 
-    /* Fixed mobile styles */
     @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        width: 95%;
+        padding: 15px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 15px;
+      }
+
+      .logo {
+        margin-bottom: 10px;
+      }
+
+      .title {
+        font-size: 16px;
+        text-align: center;
+      }
+
       .main-content {
         flex-direction: column;
         height: auto;
+        gap: 10px;
       }
-      
+
+      #chat {
+        height: 300px;
+      }
+
       .side-buttons {
-        margin-bottom: 20px;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
       }
-      
+
       .side-button {
-        width: 48%;
-        margin-bottom: 10px;
         padding: 10px;
         font-size: 14px;
-      }
-      
-      .side-button .icon {
-        margin-right: 8px;
-        font-size: 18px;
-      }
-      
-      .message {
-        max-width: 90%;
-      }
-      
-      .header {
         flex-direction: column;
-        align-items: flex-start;
+        text-align: center;
+        width: auto;
       }
-      
-      .title {
-        font-size: 18px;
-        margin-top: 10px;
+
+      .side-button .icon {
+        margin-right: 0;
+        margin-bottom: 5px;
       }
-      
+
       .input-area {
         display: flex;
-        width: 100%;
+        position: relative;
+        margin-top: 10px;
       }
-      
+
+      #userInput {
+        width: 100%;
+        padding-right: 60px; /* Make room for send button */
+      }
+
       button.send-btn {
-        padding: 0 15px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 60px;
       }
-      
-      #chat {
-        height: 300px;
+
+      #fileUpload {
+        margin-top: 10px;
+        padding: 10px;
+      }
+
+      #fileInput {
+        width: 100%;
       }
     }
   </style>
@@ -277,10 +305,6 @@
 
     <div class="main-content">
       <div class="side-buttons">
-        <button class="side-button" onclick="downloadChat()">
-          <div class="icon">⬇️</div>
-          Download Chat
-        </button>
         <button class="side-button" id="downloadAppealBtn">
           <div class="icon">📄</div>
           Download Appeal
@@ -292,6 +316,10 @@
         <button class="side-button" id="stepByStepBtn">
           <div class="icon">📋</div>
           Use Step-by-Step Guide
+        </button>
+        <button class="side-button" onclick="downloadChat()">
+          <div class="icon">⬇️</div>
+          Download Chat
         </button>
       </div>
 
@@ -374,8 +402,9 @@
       ];
 
       // Ensure buttons exist before adding event listeners
-      if (document.getElementById('btn1')) {
-        document.getElementById('btn1').onclick = () => presetMessage('Can you help me understand my medical bill?');
+      const btn1 = document.getElementById('btn1');
+      if (btn1) {
+        btn1.onclick = () => presetMessage('Can you help me understand my medical bill?');
         document.getElementById('btn2').onclick = () => presetMessage("What can I do if I can't pay my bill?");
         document.getElementById('btn3').onclick = () => presetMessage("Ask me a question about your medical bill.");
         document.getElementById('btn4').onclick = () => presetMessage("Use the step-by-step guide to help you.");
@@ -410,7 +439,9 @@
         }
       });
 
-      downloadBtn.addEventListener('click', downloadLetter);
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadLetter);
+      }
 
       function downloadLetter() {
         if (!lastLetter) return alert("No letter to download yet.");
@@ -476,7 +507,10 @@
 
           if (data.offerDownload) {
             lastLetter = data.reply;
-            downloadBtn.style.display = "inline-block";
+            const downloadBtn = document.getElementById('downloadLetterBtn');
+            if (downloadBtn) {
+              downloadBtn.style.display = "inline-block";
+            }
           }
         } catch (error) {
           removeTyping();
