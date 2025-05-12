@@ -132,6 +132,20 @@
       outline: none;
     }
 
+/* Normalize fonts and appearance across buttons and links */
+.side-button,
+.resource-button,
+.side-button:link,
+.side-button:visited,
+.resource-button:link,
+.resource-button:visited {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #333;
+}
+
     button.send-btn {
       padding: 0 20px;
       background-color: #4a90e2;
@@ -548,17 +562,17 @@
           if (lastLetter) {
             downloadLetter();
           } else {
-            presetMessage("I need help writing an appeal letter");
+            presetMessage("I need help writing an appeal letter.");
           }
         };
       }
       
       if (helpUnderstandBtn) {
-        helpUnderstandBtn.onclick = () => presetMessage("Help me understand my claim");
+        helpUnderstandBtn.onclick = () => presetMessage("Help me understand my claim.");
       }
       
       if (stepByStepBtn) {
-        stepByStepBtn.onclick = () => presetMessage("Use the step-by-step guide to help you");
+        stepByStepBtn.onclick = () => presetMessage("Use the step-by-step guide to help you.");
       }
       
       document.getElementById('downloadChatBtn').onclick = downloadChat;
