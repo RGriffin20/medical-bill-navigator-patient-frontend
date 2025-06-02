@@ -185,15 +185,36 @@
 
     /* Desktop specific button fixes */
     @media (min-width: 769px) {
+      .side-buttons {
+        position: relative;
+        z-index: 1000;
+        pointer-events: auto;
+      }
+      
       .side-buttons .side-button {
         background-color: white !important;
         pointer-events: auto !important;
-        z-index: 1000 !important;
+        z-index: 1001 !important;
         position: relative !important;
+        /* Temporary debug border to see button boundaries */
+        border: 2px solid red !important;
       }
       
       .side-buttons .side-button:hover {
         background-color: #f5f8ff !important;
+        border: 2px solid blue !important;
+      }
+      
+      /* Check if main-content is causing issues */
+      .main-content {
+        position: relative;
+        z-index: 1;
+      }
+      
+      /* Ensure chat section doesn't overlap */
+      .chat-section {
+        position: relative;
+        z-index: 1;
       }
     }
 
