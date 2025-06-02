@@ -174,7 +174,27 @@
       color: #333;
       /* Ensure buttons are clickable */
       position: relative;
-      z-index: 1;
+      z-index: 100;
+      /* Debug styles */
+      pointer-events: auto;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Desktop specific button fixes */
+    @media (min-width: 769px) {
+      .side-buttons .side-button {
+        background-color: white !important;
+        pointer-events: auto !important;
+        z-index: 1000 !important;
+        position: relative !important;
+      }
+      
+      .side-buttons .side-button:hover {
+        background-color: #f5f8ff !important;
+      }
     }
 
     .side-button:hover,
@@ -530,41 +550,104 @@
       
       document.getElementById('sendBtn').onclick = sendMessage;
       
-      // Desktop side buttons functionality - Fixed event listeners
+      // Debug: Check if buttons exist
+      console.log('Desktop buttons found:', {
+        downloadAppealBtn: !!downloadAppealBtn,
+        helpUnderstandBtn: !!helpUnderstandBtn,
+        stepByStepBtn: !!stepByStepBtn,
+        downloadChatBtn: !!downloadChatBtn
+      });
+
+      // Desktop side buttons functionality - Multiple event binding approaches
       if (downloadAppealBtn) {
+        console.log('Setting up downloadAppealBtn listeners');
+        
+        // Method 1: addEventListener
         downloadAppealBtn.addEventListener('click', function(e) {
           e.preventDefault();
-          console.log('Download Appeal button clicked'); // Debug log
+          e.stopPropagation();
+          console.log('Download Appeal button clicked via addEventListener');
           if (lastLetter) {
             downloadLetter();
           } else {
             presetMessage("I need help writing an appeal letter.");
           }
         });
+        
+        // Method 2: onclick as backup
+        downloadAppealBtn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Download Appeal button clicked via onclick');
+          if (lastLetter) {
+            downloadLetter();
+          } else {
+            presetMessage("I need help writing an appeal letter.");
+          }
+        };
+        
+        // Method 3: Test click detection
+        downloadAppealBtn.addEventListener('mousedown', function() {
+          console.log('Download Appeal button mousedown detected');
+        });
+      } else {
+        console.log('downloadAppealBtn not found!');
       }
       
       if (helpUnderstandBtn) {
+        console.log('Setting up helpUnderstandBtn listeners');
+        
         helpUnderstandBtn.addEventListener('click', function(e) {
           e.preventDefault();
-          console.log('Help Understand button clicked'); // Debug log
+          e.stopPropagation();
+          console.log('Help Understand button clicked via addEventListener');
           presetMessage("Help me understand my claim.");
         });
+        
+        helpUnderstandBtn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Help Understand button clicked via onclick');
+          presetMessage("Help me understand my claim.");
+        };
+        
+        helpUnderstandBtn.addEventListener('mousedown', function() {
+          console.log('Help Understand button mousedown detected');
+        });
+      } else {
+        console.log('helpUnderstandBtn not found!');
       }
       
       if (stepByStepBtn) {
         stepByStepBtn.addEventListener('click', function(e) {
           e.preventDefault();
-          console.log('Step by Step button clicked'); // Debug log
+          e.stopPropagation();
+          console.log('Step by Step button clicked');
           presetMessage("Use the step-by-step guide to help you.");
         });
+        
+        stepByStepBtn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Step by Step button clicked via onclick');
+          presetMessage("Use the step-by-step guide to help you.");
+        };
       }
       
       if (downloadChatBtn) {
         downloadChatBtn.addEventListener('click', function(e) {
           e.preventDefault();
-          console.log('Download Chat button clicked'); // Debug log
+          e.stopPropagation();
+          console.log('Download Chat button clicked');
           downloadChat();
         });
+        
+        downloadChatBtn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Download Chat button clicked via onclick');
+          downloadChat();
+        };
       }
       
       // Mobile buttons functionality
