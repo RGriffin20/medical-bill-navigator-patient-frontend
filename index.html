@@ -172,67 +172,13 @@
       font-size: 16px;
       text-decoration: none;
       color: #333;
-      /* Ensure buttons are clickable */
       position: relative;
       z-index: 100;
-      /* Debug styles */
       pointer-events: auto;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
-    }
-
-    /* Desktop specific button fixes */
-    @media (min-width: 769px) {
-      .side-buttons {
-        position: relative;
-        z-index: 1000;
-        pointer-events: auto;
-        /* Ensure side buttons don't get compressed */
-        min-width: 250px;
-        flex-shrink: 0;
-      }
-      
-      .side-buttons .side-button {
-        background-color: white !important;
-        pointer-events: auto !important;
-        z-index: 1001 !important;
-        position: relative !important;
-        /* Temporary debug border to see button boundaries */
-        border: 2px solid red !important;
-        /* Prevent any overlapping */
-        margin-bottom: 5px;
-        /* Ensure full width */
-        width: 100%;
-        box-sizing: border-box;
-      }
-      
-      .side-buttons .side-button:hover {
-        background-color: #f5f8ff !important;
-        border: 2px solid blue !important;
-      }
-      
-      /* Check if main-content is causing issues */
-      .main-content {
-        position: relative;
-        z-index: 1;
-        /* Prevent chat from expanding over buttons */
-        overflow: hidden;
-      }
-      
-      /* Ensure chat section doesn't overlap */
-      .chat-section {
-        position: relative;
-        z-index: 1;
-        /* Prevent overflow that might cover buttons */
-        max-width: calc(100% - 270px);
-      }
-      
-      /* Fix potential flexbox issues */
-      .main-content {
-        align-items: flex-start;
-      }
     }
 
     .side-button:hover,
@@ -283,6 +229,56 @@
     /* Hide resource buttons in desktop view since they're in the side panel */
     .resource-buttons {
       display: none;
+    }
+
+    /* Hide mobile buttons on desktop */
+    .mobile-buttons {
+      display: none;
+    }
+
+    /* Desktop specific button fixes */
+    @media (min-width: 769px) {
+      .side-buttons {
+        position: relative;
+        z-index: 10000;
+        pointer-events: auto;
+        min-width: 250px;
+        flex-shrink: 0;
+      }
+      
+      .side-buttons .side-button {
+        background-color: white !important;
+        pointer-events: auto !important;
+        z-index: 10001 !important;
+        position: relative !important;
+        margin-bottom: 5px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      
+      .side-buttons .side-button:hover {
+        background-color: #f5f8ff !important;
+      }
+      
+      .main-content {
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+        align-items: flex-start;
+      }
+      
+      .chat-section {
+        position: relative;
+        z-index: 1;
+        max-width: calc(100% - 270px);
+      }
+      
+      .mobile-buttons {
+        display: none;
+      }
+      .side-buttons {
+        display: flex;
+      }
     }
 
     @media (max-width: 768px) {
@@ -395,20 +391,6 @@
       
       .resource-button .icon {
         margin-right: 10px;
-      }
-    }
-
-    /* Hide mobile buttons on desktop */
-    .mobile-buttons {
-      display: none;
-    }
-
-    @media (min-width: 769px) {
-      .mobile-buttons {
-        display: none;
-      }
-      .side-buttons {
-        display: flex;
       }
     }
   </style>
@@ -559,31 +541,6 @@
       const fileInput = document.getElementById('fileInput');
       const fileLabel = document.getElementById('fileLabel');
       const downloadBtn = document.getElementById('downloadLetterBtn');
-      // Debug: Let's find all buttons and see what's happening
-      console.log('All buttons with side-button class:', document.querySelectorAll('.side-button'));
-      console.log('All elements with downloadAppealBtn ID:', document.querySelectorAll('#downloadAppealBtn'));
-      console.log('All buttons in side-buttons container:', document.querySelectorAll('.side-buttons button'));
-      
-      const downloadAppealBtn = document.getElementById('downloadAppealBtn');
-      const helpUnderstandBtn = document.getElementById('helpUnderstandBtn');
-      const stepByStepBtn = document.getElementById('stepByStepBtn');
-      const downloadChatBtn = document.getElementById('downloadChatBtn');
-      
-      // Let's also try querySelector as backup
-      const downloadAppealBtnAlt = document.querySelector('#downloadAppealBtn');
-      const downloadAppealBtnAlt2 = document.querySelector('.side-buttons button:first-child');
-      
-      console.log('Button finding results:', {
-        getElementById: downloadAppealBtn,
-        querySelector: downloadAppealBtnAlt,
-        firstButtonInContainer: downloadAppealBtnAlt2
-      });
-      
-      // Mobile buttons
-      const mobileDownloadAppealBtn = document.getElementById('mobileDownloadAppealBtn');
-      const mobileHelpUnderstandBtn = document.getElementById('mobileHelpUnderstandBtn');
-      const mobileStepByStepBtn = document.getElementById('mobileStepByStepBtn');
-      const mobileDownloadChatBtn = document.getElementById('mobileDownloadChatBtn');
 
       const messageHistory = [
         {
@@ -591,6 +548,44 @@
           content: `You are the user's Medical Bill Navigator. Be clear, kind, and helpful. Speak at a 6th-grade reading level. Format responses with <h3> for headings, short <p> paragraphs, and bullet/numbered lists as needed.`
         }
       ];
+
+      // Force fix any overlay issues that might block buttons
+      function forceFixOverlays() {
+        // Lower z-index of potential blocking elements
+        const highZElements = Array.from(document.querySelectorAll('*')).filter(el => {
+          const style = window.getComputedStyle(el);
+          return parseInt(style.zIndex) > 5000;
+        });
+        
+        highZElements.forEach(el => {
+          if (!el.closest('.side-buttons') && !el.closest('.container')) {
+            el.style.zIndex = '1';
+          }
+        });
+        
+        // Boost our button container z-index
+        const sideButtons = document.querySelector('.side-buttons');
+        if (sideButtons) {
+          sideButtons.style.zIndex = '99999';
+          sideButtons.style.position = 'relative';
+        }
+      }
+
+      // Run the overlay fix immediately and after delay
+      forceFixOverlays();
+      setTimeout(forceFixOverlays, 2000);
+
+      // Get button references
+      const downloadAppealBtn = document.getElementById('downloadAppealBtn');
+      const helpUnderstandBtn = document.getElementById('helpUnderstandBtn');
+      const stepByStepBtn = document.getElementById('stepByStepBtn');
+      const downloadChatBtn = document.getElementById('downloadChatBtn');
+      
+      // Mobile buttons
+      const mobileDownloadAppealBtn = document.getElementById('mobileDownloadAppealBtn');
+      const mobileHelpUnderstandBtn = document.getElementById('mobileHelpUnderstandBtn');
+      const mobileStepByStepBtn = document.getElementById('mobileStepByStepBtn');
+      const mobileDownloadChatBtn = document.getElementById('mobileDownloadChatBtn');
 
       // Ensure buttons exist before adding event listeners
       const btn1 = document.getElementById('btn1');
@@ -602,250 +597,61 @@
       }
       
       document.getElementById('sendBtn').onclick = sendMessage;
-      
-      // Debug: Check if buttons exist and their properties
-      console.log('Desktop buttons found:', {
-        downloadAppealBtn: !!downloadAppealBtn,
-        helpUnderstandBtn: !!helpUnderstandBtn,
-        stepByStepBtn: !!stepByStepBtn,
-        downloadChatBtn: !!downloadChatBtn
-      });
-      
-      // Check specific properties of Download Appeal button
-      if (downloadAppealBtn) {
-        console.log('Download Appeal Button Details:', {
-          id: downloadAppealBtn.id,
-          className: downloadAppealBtn.className,
-          tagName: downloadAppealBtn.tagName,
-          disabled: downloadAppealBtn.disabled,
-          style: downloadAppealBtn.style.cssText,
-          offsetWidth: downloadAppealBtn.offsetWidth,
-          offsetHeight: downloadAppealBtn.offsetHeight,
-          computedStyle: window.getComputedStyle(downloadAppealBtn).pointerEvents
-        });
-      }
-      
-      // Check if there are multiple elements with same ID
-      const allDownloadBtns = document.querySelectorAll('#downloadAppealBtn');
-      console.log('Number of elements with downloadAppealBtn ID:', allDownloadBtns.length);
-      allDownloadBtns.forEach((btn, index) => {
-        console.log(`Download button ${index}:`, btn.className, btn.tagName);
-      });
 
-      // Desktop side buttons functionality - Multiple event binding approaches
-      // Try multiple ways to find the Download Appeal button
-      let downloadAppealButton = downloadAppealBtn || downloadAppealBtnAlt || downloadAppealBtnAlt2;
-      
-      if (!downloadAppealButton) {
-        // Last resort: find by text content
-        const allButtons = document.querySelectorAll('button, .side-button');
-        allButtons.forEach(btn => {
-          if (btn.textContent && btn.textContent.includes('Download Appeal')) {
-            downloadAppealButton = btn;
-            console.log('Found Download Appeal button by text content:', btn);
-          }
-        });
-      }
-      
-      if (downloadAppealButton) {
-        console.log('Setting up downloadAppealBtn listeners on:', downloadAppealButton);
+      // Desktop side buttons functionality with multiple fallback methods
+      function setupButton(button, message) {
+        if (!button) return;
         
-        // Force styles to ensure it's clickable
-        downloadAppealButton.style.pointerEvents = 'auto';
-        downloadAppealButton.style.zIndex = '9999';
-        downloadAppealButton.style.position = 'relative';
-        downloadAppealButton.style.border = '3px solid green'; // Different color for this button
+        // Force styles
+        button.style.pointerEvents = 'auto';
+        button.style.zIndex = '10001';
+        button.style.position = 'relative';
         
-        // Method 1: addEventListener
-        downloadAppealButton.addEventListener('click', function(e) {
+        // Multiple event binding methods
+        button.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('Download Appeal button clicked via addEventListener');
-          alert('Download Appeal clicked!'); // Visual confirmation
-          if (lastLetter) {
-            downloadLetter();
+          if (message === "DOWNLOAD") {
+            if (lastLetter) {
+              downloadLetter();
+            } else {
+              presetMessage("I need help writing an appeal letter.");
+            }
+          } else if (message === "CHAT") {
+            downloadChat();
           } else {
-            presetMessage("I need help writing an appeal letter.");
+            presetMessage(message);
           }
         });
         
-        // Method 2: onclick as backup
-        downloadAppealButton.onclick = function(e) {
+        button.onclick = function(e) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('Download Appeal button clicked via onclick');
-          alert('Download Appeal onclick triggered!'); // Visual confirmation
-          if (lastLetter) {
-            downloadLetter();
+          if (message === "DOWNLOAD") {
+            if (lastLetter) {
+              downloadLetter();
+            } else {
+              presetMessage("I need help writing an appeal letter.");
+            }
+          } else if (message === "CHAT") {
+            downloadChat();
           } else {
-            presetMessage("I need help writing an appeal letter.");
+            presetMessage(message);
           }
         };
-        
-        // Method 3: All mouse events for debugging
-        ['mousedown', 'mouseup', 'mouseover', 'mouseout', 'click'].forEach(eventType => {
-          downloadAppealButton.addEventListener(eventType, function(e) {
-            console.log(`Download Appeal button ${eventType} detected`);
-          });
-        });
-        
-      } else {
-        console.log('Download Appeal button not found by any method!');
-        // Force create listeners on all side buttons
-        document.querySelectorAll('.side-button').forEach((btn, index) => {
-          console.log(`Side button ${index}:`, btn.textContent);
-          if (btn.textContent && btn.textContent.includes('Download Appeal')) {
-            btn.style.border = '3px solid orange';
-            btn.addEventListener('click', function(e) {
-              e.preventDefault();
-              alert('Download Appeal found and clicked!');
-              if (lastLetter) {
-                downloadLetter();
-              } else {
-                presetMessage("I need help writing an appeal letter.");
-              }
-            });
-          }
-        });
       }
-      
-      // Try multiple ways to find the Help Understand button
-      let helpUnderstandButton = helpUnderstandBtn;
-      
-      if (!helpUnderstandButton) {
-        // Last resort: find by text content
-        const allButtons = document.querySelectorAll('button, .side-button');
-        allButtons.forEach(btn => {
-          if (btn.textContent && btn.textContent.includes('Help Me Understand')) {
-            helpUnderstandButton = btn;
-            console.log('Found Help Understand button by text content:', btn);
-          }
-        });
-      }
-      
-      if (helpUnderstandButton) {
-        console.log('Setting up helpUnderstandBtn listeners on:', helpUnderstandButton);
-        
-        // Force styles and add blue border for identification
-        helpUnderstandButton.style.pointerEvents = 'auto';
-        helpUnderstandButton.style.zIndex = '9999';
-        helpUnderstandButton.style.position = 'relative';
-        helpUnderstandButton.style.border = '3px solid blue'; // Blue border for this button
-        
-        // Add screen size monitoring
-        function logScreenInfo() {
-          console.log('Screen info when Help button clicked:', {
-            windowWidth: window.innerWidth,
-            windowHeight: window.innerHeight,
-            buttonRect: helpUnderstandButton.getBoundingClientRect(),
-            buttonVisible: helpUnderstandButton.offsetWidth > 0 && helpUnderstandButton.offsetHeight > 0
-          });
-        }
-        
-        helpUnderstandButton.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Help Understand button clicked via addEventListener');
-          logScreenInfo();
-          alert('Help Understand clicked!'); // Visual confirmation
-          presetMessage("Help me understand my claim.");
-        });
-        
-        helpUnderstandButton.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Help Understand button clicked via onclick');
-          logScreenInfo();
-          alert('Help Understand onclick triggered!'); // Visual confirmation
-          presetMessage("Help me understand my claim.");
-        };
-        
-        // Monitor all mouse events
-        ['mousedown', 'mouseup', 'mouseover', 'mouseout', 'click'].forEach(eventType => {
-          helpUnderstandButton.addEventListener(eventType, function(e) {
-            console.log(`Help Understand button ${eventType} detected at screen size: ${window.innerWidth}x${window.innerHeight}`);
-          });
-        });
-        
-      } else {
-        console.log('Help Understand button not found by any method!');
-        // Force create listeners on all side buttons
-        document.querySelectorAll('.side-button').forEach((btn, index) => {
-          if (btn.textContent && btn.textContent.includes('Help Me Understand')) {
-            btn.style.border = '3px solid purple';
-            btn.addEventListener('click', function(e) {
-              e.preventDefault();
-              alert('Help Understand found and clicked!');
-              presetMessage("Help me understand my claim.");
-            });
-          }
-        });
-      }
-      
-      if (stepByStepBtn) {
-        stepByStepBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Step by Step button clicked');
-          presetMessage("Use the step-by-step guide to help you.");
-        });
-        
-        stepByStepBtn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Step by Step button clicked via onclick');
-          presetMessage("Use the step-by-step guide to help you.");
-        };
-      }
-      
-      if (downloadChatBtn) {
-        downloadChatBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Download Chat button clicked');
-          downloadChat();
-        });
-        
-        downloadChatBtn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Download Chat button clicked via onclick');
-          downloadChat();
-        };
-      }
-      
-      // Mobile buttons functionality
-      if (mobileDownloadAppealBtn) {
-        mobileDownloadAppealBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (lastLetter) {
-            downloadLetter();
-          } else {
-            presetMessage("I need help writing an appeal letter");
-          }
-        });
-      }
-      
-      if (mobileHelpUnderstandBtn) {
-        mobileHelpUnderstandBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          presetMessage("Help me understand my claim");
-        });
-      }
-      
-      if (mobileStepByStepBtn) {
-        mobileStepByStepBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          presetMessage("Use the step-by-step guide to help you");
-        });
-      }
-      
-      if (mobileDownloadChatBtn) {
-        mobileDownloadChatBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          downloadChat();
-        });
-      }
+
+      // Setup all desktop buttons
+      setupButton(downloadAppealBtn, "DOWNLOAD");
+      setupButton(helpUnderstandBtn, "Help me understand my claim.");
+      setupButton(stepByStepBtn, "Use the step-by-step guide to help you.");
+      setupButton(downloadChatBtn, "CHAT");
+
+      // Setup mobile buttons
+      setupButton(mobileDownloadAppealBtn, "DOWNLOAD");
+      setupButton(mobileHelpUnderstandBtn, "Help me understand my claim.");
+      setupButton(mobileStepByStepBtn, "Use the step-by-step guide to help you.");
+      setupButton(mobileDownloadChatBtn, "CHAT");
 
       // Add Enter key press functionality for better UX
       input.addEventListener('keypress', function(e) {
