@@ -612,7 +612,7 @@
       
       document.getElementById('sendBtn').onclick = sendMessage;
 
-      // Desktop side buttons functionality with multiple fallback methods
+      // Desktop side buttons functionality with single event binding
       function setupButton(button, message) {
         if (!button) return;
         
@@ -621,7 +621,7 @@
         button.style.zIndex = '10001';
         button.style.position = 'relative';
         
-        // Multiple event binding methods
+        // Use ONLY addEventListener - remove onclick to prevent duplicates
         button.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
@@ -637,22 +637,6 @@
             presetMessage(message);
           }
         });
-        
-        button.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (message === "DOWNLOAD") {
-            if (lastLetter) {
-              downloadLetter();
-            } else {
-              presetMessage("I need help writing an appeal letter.");
-            }
-          } else if (message === "CHAT") {
-            downloadChat();
-          } else {
-            presetMessage(message);
-          }
-        };
       }
 
       // Setup all desktop buttons
