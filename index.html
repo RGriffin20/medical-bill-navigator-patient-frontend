@@ -86,6 +86,20 @@
       min-height: 300px;
     }
 
+    /* Screen reader only content */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Ensure good contrast for accessibility */
     .message {
       margin: 10px 0;
       padding: 12px 16px;
@@ -470,9 +484,9 @@
           </div>
         </div>
 
-        <div class="input-area">
-          <input type="text" id="userInput" placeholder="Send a message..." />
-          <button class="send-btn" id="sendBtn">Send</button>
+        <div class="input-area" role="search" aria-label="Send message to Medical Bill Navigator">
+          <input type="text" id="userInput" placeholder="Send a message..." aria-label="Type your message here" />
+          <button class="send-btn" id="sendBtn" aria-label="Send message">Send</button>
         </div>
 
         <div id="fileUpload">
@@ -752,17 +766,40 @@
       function addMessage(sender, text, type) {
         const messageContainer = document.createElement("div");
         messageContainer.className = "message-container";
+        messageContainer.setAttribute("role", "group");
+        messageContainer.setAttribute("aria-label", `Message from ${sender}`);
         
         const msg = document.createElement("div");
         msg.className = `message ${type}`;
+        msg.setAttribute("role", type === "bot" ? "status" : "log");
+        msg.setAttribute("aria-label", type === "bot" ? "Navigator response" : "Your message");
         
         // Don't show "Navigator:" for bot messages to match the design
         const senderText = type === "bot" ? "" : `<strong>${sender}:</strong><br>`;
         msg.innerHTML = `${senderText}${formatMarkdown(text)}`;
         
+        // Add screen reader content
+        const srOnly = document.createElement("span");
+        srOnly.className = "sr-only";
+        srOnly.textContent = type === "bot" ? "Navigator says: " : `${sender} says: `;
+        msg.insertBefore(srOnly, msg.firstChild);
+        
         messageContainer.appendChild(msg);
         chat.appendChild(messageContainer);
         chat.scrollTop = chat.scrollHeight;
+        
+        // Announce new messages to screen readers
+        if (type === "bot") {
+          setTimeout(() => {
+            const announcement = document.createElement("div");
+            announcement.setAttribute("aria-live", "assertive");
+            announcement.setAttribute("aria-atomic", "true");
+            announcement.className = "sr-only";
+            announcement.textContent = `Navigator responded: ${msg.textContent.replace("Navigator says: ", "")}`;
+            document.body.appendChild(announcement);
+            setTimeout(() => document.body.removeChild(announcement), 1000);
+          }, 100);
+        }
       }
 
       function formatMarkdown(text) {
