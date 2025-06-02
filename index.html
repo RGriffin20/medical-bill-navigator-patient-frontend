@@ -571,23 +571,51 @@
       
       document.getElementById('sendBtn').onclick = sendMessage;
       
-      // Debug: Check if buttons exist
+      // Debug: Check if buttons exist and their properties
       console.log('Desktop buttons found:', {
         downloadAppealBtn: !!downloadAppealBtn,
         helpUnderstandBtn: !!helpUnderstandBtn,
         stepByStepBtn: !!stepByStepBtn,
         downloadChatBtn: !!downloadChatBtn
       });
+      
+      // Check specific properties of Download Appeal button
+      if (downloadAppealBtn) {
+        console.log('Download Appeal Button Details:', {
+          id: downloadAppealBtn.id,
+          className: downloadAppealBtn.className,
+          tagName: downloadAppealBtn.tagName,
+          disabled: downloadAppealBtn.disabled,
+          style: downloadAppealBtn.style.cssText,
+          offsetWidth: downloadAppealBtn.offsetWidth,
+          offsetHeight: downloadAppealBtn.offsetHeight,
+          computedStyle: window.getComputedStyle(downloadAppealBtn).pointerEvents
+        });
+      }
+      
+      // Check if there are multiple elements with same ID
+      const allDownloadBtns = document.querySelectorAll('#downloadAppealBtn');
+      console.log('Number of elements with downloadAppealBtn ID:', allDownloadBtns.length);
+      allDownloadBtns.forEach((btn, index) => {
+        console.log(`Download button ${index}:`, btn.className, btn.tagName);
+      });
 
       // Desktop side buttons functionality - Multiple event binding approaches
       if (downloadAppealBtn) {
         console.log('Setting up downloadAppealBtn listeners');
+        
+        // Force styles to ensure it's clickable
+        downloadAppealBtn.style.pointerEvents = 'auto';
+        downloadAppealBtn.style.zIndex = '9999';
+        downloadAppealBtn.style.position = 'relative';
+        downloadAppealBtn.style.border = '3px solid green'; // Different color for this button
         
         // Method 1: addEventListener
         downloadAppealBtn.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           console.log('Download Appeal button clicked via addEventListener');
+          alert('Download Appeal clicked!'); // Visual confirmation
           if (lastLetter) {
             downloadLetter();
           } else {
@@ -600,6 +628,7 @@
           e.preventDefault();
           e.stopPropagation();
           console.log('Download Appeal button clicked via onclick');
+          alert('Download Appeal onclick triggered!'); // Visual confirmation
           if (lastLetter) {
             downloadLetter();
           } else {
@@ -607,10 +636,13 @@
           }
         };
         
-        // Method 3: Test click detection
-        downloadAppealBtn.addEventListener('mousedown', function() {
-          console.log('Download Appeal button mousedown detected');
+        // Method 3: All mouse events for debugging
+        ['mousedown', 'mouseup', 'mouseover', 'mouseout', 'click'].forEach(eventType => {
+          downloadAppealBtn.addEventListener(eventType, function(e) {
+            console.log(`Download Appeal button ${eventType} detected`);
+          });
         });
+        
       } else {
         console.log('downloadAppealBtn not found!');
       }
