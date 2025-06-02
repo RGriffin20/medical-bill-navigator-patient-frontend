@@ -542,10 +542,25 @@
       const fileInput = document.getElementById('fileInput');
       const fileLabel = document.getElementById('fileLabel');
       const downloadBtn = document.getElementById('downloadLetterBtn');
+      // Debug: Let's find all buttons and see what's happening
+      console.log('All buttons with side-button class:', document.querySelectorAll('.side-button'));
+      console.log('All elements with downloadAppealBtn ID:', document.querySelectorAll('#downloadAppealBtn'));
+      console.log('All buttons in side-buttons container:', document.querySelectorAll('.side-buttons button'));
+      
       const downloadAppealBtn = document.getElementById('downloadAppealBtn');
       const helpUnderstandBtn = document.getElementById('helpUnderstandBtn');
       const stepByStepBtn = document.getElementById('stepByStepBtn');
       const downloadChatBtn = document.getElementById('downloadChatBtn');
+      
+      // Let's also try querySelector as backup
+      const downloadAppealBtnAlt = document.querySelector('#downloadAppealBtn');
+      const downloadAppealBtnAlt2 = document.querySelector('.side-buttons button:first-child');
+      
+      console.log('Button finding results:', {
+        getElementById: downloadAppealBtn,
+        querySelector: downloadAppealBtnAlt,
+        firstButtonInContainer: downloadAppealBtnAlt2
+      });
       
       // Mobile buttons
       const mobileDownloadAppealBtn = document.getElementById('mobileDownloadAppealBtn');
@@ -601,17 +616,31 @@
       });
 
       // Desktop side buttons functionality - Multiple event binding approaches
-      if (downloadAppealBtn) {
-        console.log('Setting up downloadAppealBtn listeners');
+      // Try multiple ways to find the Download Appeal button
+      let downloadAppealButton = downloadAppealBtn || downloadAppealBtnAlt || downloadAppealBtnAlt2;
+      
+      if (!downloadAppealButton) {
+        // Last resort: find by text content
+        const allButtons = document.querySelectorAll('button, .side-button');
+        allButtons.forEach(btn => {
+          if (btn.textContent && btn.textContent.includes('Download Appeal')) {
+            downloadAppealButton = btn;
+            console.log('Found Download Appeal button by text content:', btn);
+          }
+        });
+      }
+      
+      if (downloadAppealButton) {
+        console.log('Setting up downloadAppealBtn listeners on:', downloadAppealButton);
         
         // Force styles to ensure it's clickable
-        downloadAppealBtn.style.pointerEvents = 'auto';
-        downloadAppealBtn.style.zIndex = '9999';
-        downloadAppealBtn.style.position = 'relative';
-        downloadAppealBtn.style.border = '3px solid green'; // Different color for this button
+        downloadAppealButton.style.pointerEvents = 'auto';
+        downloadAppealButton.style.zIndex = '9999';
+        downloadAppealButton.style.position = 'relative';
+        downloadAppealButton.style.border = '3px solid green'; // Different color for this button
         
         // Method 1: addEventListener
-        downloadAppealBtn.addEventListener('click', function(e) {
+        downloadAppealButton.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           console.log('Download Appeal button clicked via addEventListener');
@@ -624,7 +653,7 @@
         });
         
         // Method 2: onclick as backup
-        downloadAppealBtn.onclick = function(e) {
+        downloadAppealButton.onclick = function(e) {
           e.preventDefault();
           e.stopPropagation();
           console.log('Download Appeal button clicked via onclick');
@@ -638,37 +667,102 @@
         
         // Method 3: All mouse events for debugging
         ['mousedown', 'mouseup', 'mouseover', 'mouseout', 'click'].forEach(eventType => {
-          downloadAppealBtn.addEventListener(eventType, function(e) {
+          downloadAppealButton.addEventListener(eventType, function(e) {
             console.log(`Download Appeal button ${eventType} detected`);
           });
         });
         
       } else {
-        console.log('downloadAppealBtn not found!');
+        console.log('Download Appeal button not found by any method!');
+        // Force create listeners on all side buttons
+        document.querySelectorAll('.side-button').forEach((btn, index) => {
+          console.log(`Side button ${index}:`, btn.textContent);
+          if (btn.textContent && btn.textContent.includes('Download Appeal')) {
+            btn.style.border = '3px solid orange';
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              alert('Download Appeal found and clicked!');
+              if (lastLetter) {
+                downloadLetter();
+              } else {
+                presetMessage("I need help writing an appeal letter.");
+              }
+            });
+          }
+        });
       }
       
-      if (helpUnderstandBtn) {
-        console.log('Setting up helpUnderstandBtn listeners');
+      // Try multiple ways to find the Help Understand button
+      let helpUnderstandButton = helpUnderstandBtn;
+      
+      if (!helpUnderstandButton) {
+        // Last resort: find by text content
+        const allButtons = document.querySelectorAll('button, .side-button');
+        allButtons.forEach(btn => {
+          if (btn.textContent && btn.textContent.includes('Help Me Understand')) {
+            helpUnderstandButton = btn;
+            console.log('Found Help Understand button by text content:', btn);
+          }
+        });
+      }
+      
+      if (helpUnderstandButton) {
+        console.log('Setting up helpUnderstandBtn listeners on:', helpUnderstandButton);
         
-        helpUnderstandBtn.addEventListener('click', function(e) {
+        // Force styles and add blue border for identification
+        helpUnderstandButton.style.pointerEvents = 'auto';
+        helpUnderstandButton.style.zIndex = '9999';
+        helpUnderstandButton.style.position = 'relative';
+        helpUnderstandButton.style.border = '3px solid blue'; // Blue border for this button
+        
+        // Add screen size monitoring
+        function logScreenInfo() {
+          console.log('Screen info when Help button clicked:', {
+            windowWidth: window.innerWidth,
+            windowHeight: window.innerHeight,
+            buttonRect: helpUnderstandButton.getBoundingClientRect(),
+            buttonVisible: helpUnderstandButton.offsetWidth > 0 && helpUnderstandButton.offsetHeight > 0
+          });
+        }
+        
+        helpUnderstandButton.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           console.log('Help Understand button clicked via addEventListener');
+          logScreenInfo();
+          alert('Help Understand clicked!'); // Visual confirmation
           presetMessage("Help me understand my claim.");
         });
         
-        helpUnderstandBtn.onclick = function(e) {
+        helpUnderstandButton.onclick = function(e) {
           e.preventDefault();
           e.stopPropagation();
           console.log('Help Understand button clicked via onclick');
+          logScreenInfo();
+          alert('Help Understand onclick triggered!'); // Visual confirmation
           presetMessage("Help me understand my claim.");
         };
         
-        helpUnderstandBtn.addEventListener('mousedown', function() {
-          console.log('Help Understand button mousedown detected');
+        // Monitor all mouse events
+        ['mousedown', 'mouseup', 'mouseover', 'mouseout', 'click'].forEach(eventType => {
+          helpUnderstandButton.addEventListener(eventType, function(e) {
+            console.log(`Help Understand button ${eventType} detected at screen size: ${window.innerWidth}x${window.innerHeight}`);
+          });
         });
+        
       } else {
-        console.log('helpUnderstandBtn not found!');
+        console.log('Help Understand button not found by any method!');
+        // Force create listeners on all side buttons
+        document.querySelectorAll('.side-button').forEach((btn, index) => {
+          if (btn.textContent && btn.textContent.includes('Help Me Understand')) {
+            btn.style.border = '3px solid purple';
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              alert('Help Understand found and clicked!');
+              presetMessage("Help me understand my claim.");
+            });
+          }
+        });
       }
       
       if (stepByStepBtn) {
