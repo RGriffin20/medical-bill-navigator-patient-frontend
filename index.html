@@ -189,6 +189,9 @@
         position: relative;
         z-index: 1000;
         pointer-events: auto;
+        /* Ensure side buttons don't get compressed */
+        min-width: 250px;
+        flex-shrink: 0;
       }
       
       .side-buttons .side-button {
@@ -198,6 +201,11 @@
         position: relative !important;
         /* Temporary debug border to see button boundaries */
         border: 2px solid red !important;
+        /* Prevent any overlapping */
+        margin-bottom: 5px;
+        /* Ensure full width */
+        width: 100%;
+        box-sizing: border-box;
       }
       
       .side-buttons .side-button:hover {
@@ -209,12 +217,21 @@
       .main-content {
         position: relative;
         z-index: 1;
+        /* Prevent chat from expanding over buttons */
+        overflow: hidden;
       }
       
       /* Ensure chat section doesn't overlap */
       .chat-section {
         position: relative;
         z-index: 1;
+        /* Prevent overflow that might cover buttons */
+        max-width: calc(100% - 270px);
+      }
+      
+      /* Fix potential flexbox issues */
+      .main-content {
+        align-items: flex-start;
       }
     }
 
