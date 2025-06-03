@@ -662,28 +662,49 @@
       });
 
       fileInput.addEventListener('change', async () => {
-  const file = fileInput.files[0];
-  if (!file) return;
+        const file = fileInput.files[0];
+        if (!file) return;
 
-  fileLabel.textContent = `Uploaded: ${file.name}`;
-  addMessage("You", `Uploaded file: ${file.name}`, "user");
+        console.log("📁 File selected:", file.name, file.type, file.size); // Debug log
 
-  try {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result.split(',')[1];
-      uploadedFile = {
-        name: file.name,
-        type: file.type,
-        base64: base64
-      };
-    };
-    reader.readAsDataURL(file);
-  } catch (err) {
-    console.error("Error reading file:", err);
-    fileLabel.textContent = "Error uploading file";
-  }
-});
+        fileLabel.textContent = `Uploaded: ${file.name}`;
+        addMessage("You", `Uploaded file: ${file.name}`, "user");
+
+        try {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = reader.result.split(',')[1];
+            
+            // Fix the file type detection
+            let fileType;
+            if (file.type === 'application/pdf') {
+              fileType = 'pdf';
+            } else if (file.type.startsWith('image/')) {
+              fileType = file.type.split('/')[1]; // jpg, png, jpeg
+            } else {
+              // Fallback based on file extension
+              const extension = file.name.split('.').pop().toLowerCase();
+              fileType = extension;
+            }
+            
+            uploadedFile = {
+              name: file.name,
+              type: fileType, // Use the corrected type
+              base64: base64
+            };
+            
+            console.log("📤 File prepared for upload:", {
+              name: uploadedFile.name,
+              type: uploadedFile.type,
+              base64Length: uploadedFile.base64.length
+            }); // Debug log
+          };
+          reader.readAsDataURL(file);
+        } catch (err) {
+          console.error("Error reading file:", err);
+          fileLabel.textContent = "Error uploading file";
+        }
+      });
 
       if (downloadBtn) {
         downloadBtn.addEventListener('click', downloadLetter);
@@ -724,58 +745,67 @@
         sendMessage();
       }
 
-async function sendMessage() {
-  const message = input.value.trim();
-  if (!message) return;
+      async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
 
-  addMessage("You", message, "user");
-  input.value = "";
-  messageHistory.push({ role: "user", content: message });
+        addMessage("You", message, "user");
+        input.value = "";
+        messageHistory.push({ role: "user", content: message });
 
-  showTyping();
+        showTyping();
 
-  try {
-    const requestBody = {
-      messages: messageHistory
-    };
+        try {
+          const requestBody = {
+            messages: messageHistory
+          };
 
-    if (uploadedFile) {
-      requestBody.fileBuffer = uploadedFile.base64;
-      requestBody.fileType = uploadedFile.type.split('/')[1]; // e.g., 'pdf', 'png'
-      requestBody.fileName = uploadedFile.name;
-      uploadedFile = null; // reset after use
-    }
+          if (uploadedFile) {
+            console.log("📤 Sending file with message:", uploadedFile); // Debug log
+            
+            requestBody.fileBuffer = uploadedFile.base64;
+            requestBody.fileType = uploadedFile.type; // This should now be 'pdf', 'jpg', etc.
+            requestBody.fileName = uploadedFile.name;
+            uploadedFile = null; // reset after use
+          }
 
-    const response = await fetch("https://medical-bill-navigator-patient-backend.vercel.app/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    });
+          console.log("📤 Request body:", {
+            hasMessages: !!requestBody.messages,
+            hasFileBuffer: !!requestBody.fileBuffer,
+            fileType: requestBody.fileType,
+            fileName: requestBody.fileName
+          }); // Debug log
 
-    if (!response.ok) throw new Error("Network response was not OK");
+          const response = await fetch("https://medical-bill-navigator-patient-backend.vercel.app/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          });
 
-    const data = await response.json();
-    await new Promise(resolve => setTimeout(resolve, 500));
-    removeTyping();
-    vibrateIfActive();
+          if (!response.ok) throw new Error("Network response was not OK");
 
-    messageHistory.push({ role: "assistant", content: data.reply });
-    addMessage("Navigator", data.reply, "bot");
+          const data = await response.json();
+          await new Promise(resolve => setTimeout(resolve, 500));
+          removeTyping();
+          vibrateIfActive();
 
-    if (data.offerDownload) {
-      lastLetter = data.reply;
-      const downloadBtn = document.getElementById('downloadLetterBtn');
-      if (downloadBtn) {
-        downloadBtn.style.display = "inline-block";
+          messageHistory.push({ role: "assistant", content: data.reply });
+          addMessage("Navigator", data.reply, "bot");
+
+          if (data.offerDownload) {
+            lastLetter = data.reply;
+            const downloadBtn = document.getElementById('downloadLetterBtn');
+            if (downloadBtn) {
+              downloadBtn.style.display = "inline-block";
+            }
+          }
+        } catch (error) {
+          removeTyping();
+          addMessage("Error", error.message, "bot");
+        }
+
+        chat.scrollTop = chat.scrollHeight;
       }
-    }
-  } catch (error) {
-    removeTyping();
-    addMessage("Error", error.message, "bot");
-  }
-
-  chat.scrollTop = chat.scrollHeight;
-}
 
       function addMessage(sender, text, type) {
         const messageContainer = document.createElement("div");
