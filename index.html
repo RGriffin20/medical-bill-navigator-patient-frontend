@@ -698,6 +698,10 @@
               type: uploadedFile.type,
               base64Length: uploadedFile.base64.length
             }); // Debug log
+
+            // Automatically trigger analysis like the provider version
+            input.value = "Please analyze this document.";
+            sendMessage();
           };
           reader.readAsDataURL(file);
         } catch (err) {
