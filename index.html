@@ -517,6 +517,9 @@
   <script>
     let typingInterval;
     let lastLetter = "";
+    let uploadedFile = null; // Store the uploaded file
+    // Base URL for the backend - update this value if your backend URL changes
+    const BACKEND_URL = "https://medical-bill-navigator-patient-backend.vercel.app/api/download";
 
     function showTyping() {
       const chat = document.getElementById("chat");
@@ -658,13 +661,29 @@
         }
       });
 
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0];
-        fileLabel.textContent = file ? `Uploaded: ${file.name}` : '';
-        if (file) {
-          addMessage("You", `Uploaded file: ${file.name}`, "user");
-        }
-      });
+      fileInput.addEventListener('change', async () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  fileLabel.textContent = `Uploaded: ${file.name}`;
+  addMessage("You", `Uploaded file: ${file.name}`, "user");
+
+  try {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      uploadedFile = {
+        name: file.name,
+        type: file.type,
+        base64: base64
+      };
+    };
+    reader.readAsDataURL(file);
+  } catch (err) {
+    console.error("Error reading file:", err);
+    fileLabel.textContent = "Error uploading file";
+  }
+});
 
       if (downloadBtn) {
         downloadBtn.addEventListener('click', downloadLetter);
@@ -705,47 +724,58 @@
         sendMessage();
       }
 
-      async function sendMessage() {
-        const message = input.value.trim();
-        if (!message) return;
+async function sendMessage() {
+  const message = input.value.trim();
+  if (!message) return;
 
-        addMessage("You", message, "user");
-        input.value = "";
-        messageHistory.push({ role: "user", content: message });
+  addMessage("You", message, "user");
+  input.value = "";
+  messageHistory.push({ role: "user", content: message });
 
-        showTyping();
+  showTyping();
 
-        try {
-          const response = await fetch("https://medical-bill-navigator-patient-backend.vercel.app/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ messages: messageHistory }),
-          });
+  try {
+    const requestBody = {
+      messages: messageHistory
+    };
 
-          if (!response.ok) throw new Error("Network response was not OK");
+    if (uploadedFile) {
+      requestBody.fileBuffer = uploadedFile.base64;
+      requestBody.fileType = uploadedFile.type.split('/')[1]; // e.g., 'pdf', 'png'
+      requestBody.fileName = uploadedFile.name;
+      uploadedFile = null; // reset after use
+    }
 
-          const data = await response.json();
-          await new Promise(resolve => setTimeout(resolve, 500));
-          removeTyping();
-          vibrateIfActive();
+    const response = await fetch("https://medical-bill-navigator-patient-backend.vercel.app/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    });
 
-          messageHistory.push({ role: "assistant", content: data.reply });
-          addMessage("Navigator", data.reply, "bot");
+    if (!response.ok) throw new Error("Network response was not OK");
 
-          if (data.offerDownload) {
-            lastLetter = data.reply;
-            const downloadBtn = document.getElementById('downloadLetterBtn');
-            if (downloadBtn) {
-              downloadBtn.style.display = "inline-block";
-            }
-          }
-        } catch (error) {
-          removeTyping();
-          addMessage("Error", error.message, "bot");
-        }
+    const data = await response.json();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    removeTyping();
+    vibrateIfActive();
 
-        chat.scrollTop = chat.scrollHeight;
+    messageHistory.push({ role: "assistant", content: data.reply });
+    addMessage("Navigator", data.reply, "bot");
+
+    if (data.offerDownload) {
+      lastLetter = data.reply;
+      const downloadBtn = document.getElementById('downloadLetterBtn');
+      if (downloadBtn) {
+        downloadBtn.style.display = "inline-block";
       }
+    }
+  } catch (error) {
+    removeTyping();
+    addMessage("Error", error.message, "bot");
+  }
+
+  chat.scrollTop = chat.scrollHeight;
+}
 
       function addMessage(sender, text, type) {
         const messageContainer = document.createElement("div");
