@@ -1,0 +1,80 @@
+40c6243 2025-06-18 Restore previous version.
+23d29ff 2025-06-18 Updating display.
+df85a77 2025-06-18 Updating display
+7d02fa9 2025-06-18 Updating display.
+0337ce3 2025-06-18 Updating container
+e722277 2025-06-18 Updating container size.
+bb3b0db 2025-06-18 Updating dasshboard appearance.
+9a39ce8 2025-06-18 Force redeploy with correct patient frontend
+b43b426 2025-06-03 Updating for pdf parsing.
+f3c764a 2025-06-03 Updating for pdf parsing.
+b49cb4d 2025-06-03 Updates for file parsing.
+80be8fa 2025-06-02 Updating screen reader optimization.
+e49f4d6 2025-06-02 Updating screen reader optimization.
+8b244f3 2025-06-02 Screen reader optimization.
+1e41522 2025-06-02 Updating buttons.
+7ee664c 2025-06-02 Button fix.
+39129a3 2025-06-02 Fixing desktop buttons.
+b616676 2025-06-02 Fixing buttons
+9d6959a 2025-06-02 Fixing buttons.
+7544719 2025-06-02 Fixing Desktop Buttons.
+bcbb592 2025-06-02 Fixing desktop buttons.
+026bf41 2025-06-02 Updating logo.
+3ee4496 2025-05-20 Updating accessibility.
+4e353ff 2025-05-12 Updating buttons and preset messages.
+159bb43 2025-04-27 Removed conflicting files and cleaned project
+993fc2f 2025-04-27 Recoded patient project due to overwrite.
+eec74d3 2025-04-27 Initial commit for provider project.
+dafb00a 2025-04-27 Updating buttons again.
+db98ac8 2025-04-27 Updating the desktop view for buttons.
+5dab285 2025-04-27 Updating resource buttons before file upload.
+c95b925 2025-04-27 Updating mobile send button.
+05cede1 2025-04-27 Updating mobile responsiveness
+1d55d07 2025-04-27 Revert "Updating mobile responsiveness."
+4b6daaa 2025-04-27 Updating mobile responsiveness.
+09c726a 2025-04-26 Revert "Add external resource links and improve mobile responsiveness"
+ed90d32 2025-04-26 Add external resource links and improve mobile responsiveness
+fc1350c 2025-04-26 Update header title to 'Medical Bill Navigator for Patients'
+2ecffba 2025-04-26 Update UI to match new design while preserving functionality
+4e73694 2025-04-25 Restore full working UI and chatbot features
+af60d60 2025-04-25 Revert "Update MedCourse Pro frontend: new UI and chatbot features"
+852d8f5 2025-04-25 Update MedCourse Pro frontend: new UI and chatbot features
+59d55bd 2025-04-21 Update: integrated offerDownload flag and improved appeal letter handling
+674b12d 2025-04-21 Fix: connected frontend download button to backend /api/download
+ef0e1ca 2025-04-20 Updated chat button
+d058060 2025-04-18 Update index.html for downloadable appeal letter
+1b2360c 2025-04-18 Update index.html with DOCX download functionality
+0e8da7e 2025-04-03 Add 'Navigator is typing...' animation and vibration feedback
+690c474 2025-04-03 Update presetMessage
+d88ad2a 2025-04-03 Update button text
+67809f2 2025-04-02 Revert to original working version of index.html
+e759665 2025-04-02 Fix UI bugs and restore full chat functionality
+17ee692 2025-04-02 Restore message input box and match Download the Guide button style
+5cebf1b 2025-04-02 Match 'Download the Guide' button styling with others
+ce73b7d 2025-04-02 Add 'Download the Guide' button to index.html
+6811306 2025-04-02 Add animated typing, delay, and vibration to Navigator UI
+0ab2b10 2025-04-01 Apply custom MedCourse Pro background image
+7d91362 2025-04-01 Add file upload and download chat to Medical Bill Navigator
+b190391 2025-04-01 Update index.html to disable pooling and fix formatting
+15fd70f 2025-04-01 Enhance: Add typing animation for assistant response
+013c214 2025-04-01 UI update: Typing animation and formatting fixes
+a560f88 2025-04-01 Add typing animation to chat responses
+f3f1916 2025-04-01 UI update: add typing indicator, mobile tweaks, fix layout
+3c8c053 2025-04-01 Center logo and title, restore chat layout, fix input sizing
+ba28df6 2025-04-01 Enhance UI: Add typing bubble and mobile responsiveness
+304ab53 2025-04-01 Center title, fix logo, resize input box to match ChatGPT style
+53150a3 2025-04-01 Update UI: added background image and improved chat styling
+1d52320 2025-04-01 Fix logo URL
+d9d7891 2025-03-31 Update index.html with formatted bubbles and MedCourse Pro branding
+0cefe6e 2025-03-31 Update UI: Add logo, conversation starters, and improved formatting
+6e01974 2025-03-31 Update UI with Markdown rendering, logo, and starter buttons
+8910473 2025-03-31 Fix: connect frontend to backend with full message history
+6af5f6a 2025-03-31 Upgrade UI + memory + formatting
+d50668a 2025-03-31 Style update: polished Medical Bill Navigator UI
+3b8d174 2025-03-30 Update frontend to use new backend
+198d456 2025-03-29 Fix: point frontend to correct backend URL with CORS
+dbbf638 2025-03-29 Fix: script comment removed and try/catch added
+a09c7b1 2025-03-29 Connected frontend to backend
+b630e87 2025-03-29 Fix backend URL in fetch request
+d9b049a 2025-03-29 Fix filename to index.html
+a22612b 2025-03-29 Add chatbot frontend
