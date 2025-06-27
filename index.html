@@ -407,6 +407,45 @@
         margin-right: 10px;
       }
     }
+ /* Sienna widget should be on top of everything */
+    .sienna-widget,
+    .sienna-chat-widget,
+    .sienna-launcher,
+    [class*="sienna"],
+    [id*="sienna"] {
+      z-index: 999999 !important;
+      position: fixed !important;
+    }
+
+    /* Reduce z-index of your existing buttons to be below the widget */
+    .side-button,
+    .resource-button,
+    .mobile-button {
+      z-index: 100 !important; /* Much lower than before */
+    }
+
+    .side-buttons {
+      z-index: 1000 !important; /* Lower than Sienna widget */
+    }
+
+    .container {
+      z-index: 1 !important;
+    }
+
+    .main-content {
+      z-index: 1 !important;
+    }
+
+    /* Desktop specific button fixes - reduce z-index */
+    @media (min-width: 769px) {
+      .side-buttons {
+        z-index: 1000 !important; /* Reduced from 10000 */
+      }
+      
+      .side-buttons .side-button {
+        z-index: 1001 !important; /* Reduced from 10001 */
+      }
+    }
   </style>
 </head>
 <body>
@@ -567,30 +606,7 @@
       ];
 
       // Force fix any overlay issues that might block buttons
-      function forceFixOverlays() {
-        // Lower z-index of potential blocking elements
-        const highZElements = Array.from(document.querySelectorAll('*')).filter(el => {
-          const style = window.getComputedStyle(el);
-          return parseInt(style.zIndex) > 5000;
-        });
-        
-        highZElements.forEach(el => {
-          if (!el.closest('.side-buttons') && !el.closest('.container')) {
-            el.style.zIndex = '1';
-          }
-        });
-        
-        // Boost our button container z-index
-        const sideButtons = document.querySelector('.side-buttons');
-        if (sideButtons) {
-          sideButtons.style.zIndex = '99999';
-          sideButtons.style.position = 'relative';
-        }
-      }
-
-      // Run the overlay fix immediately and after delay
-      forceFixOverlays();
-      setTimeout(forceFixOverlays, 2000);
+              
 
       // Get button references
       const downloadAppealBtn = document.getElementById('downloadAppealBtn');
@@ -621,7 +637,6 @@
         
         // Force styles
         button.style.pointerEvents = 'auto';
-        button.style.zIndex = '10001';
         button.style.position = 'relative';
         
         // Use ONLY addEventListener - remove onclick to prevent duplicates
