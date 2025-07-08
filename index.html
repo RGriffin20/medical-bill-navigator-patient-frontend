@@ -845,56 +845,20 @@
       }
 
 function formatMarkdown(text) {
-  // Split into lines for better processing
-  let lines = text.split('\n');
-  let result = [];
-  let inNumberedList = false;
-  let inBulletList = false;
-  
-  for (let line of lines) {
-    line = line.trim();
+  return text
+    // Handle headers first
+    .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
+    .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+    .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+    .replace(/^# (.*$)/gim, "<h1>$1</h1>")
     
-    // Handle headers
-    if (line.startsWith('#### ')) {
-      if (inNumberedList) { result.push('</ol>'); inNumberedList = false; }
-      if (inBulletList) { result.push('</ul>'); inBulletList = false; }
-      result.push(`<h4>${line.substring(5)}</h4>`);
-    } else if (line.startsWith('### ')) {
-      if (inNumberedList) { result.push('</ol>'); inNumberedList = false; }
-      if (inBulletList) { result.push('</ul>'); inBulletList = false; }
-      result.push(`<h3>${line.substring(4)}</h3>`);
-    } else if (line.startsWith('## ')) {
-      if (inNumberedList) { result.push('</ol>'); inNumberedList = false; }
-      if (inBulletList) { result.push('</ul>'); inBulletList = false; }
-      result.push(`<h2>${line.substring(3)}</h2>`);
-    }
-    // Handle numbered lists
-    else if (/^\d+\.\s/.test(line)) {
-      if (!inNumberedList) {
-        if (inBulletList) { result.push('</ul>'); inBulletList = false; }
-        result.push('<ol>');
-        inNumberedList = true;
-      }
-      let content = line.replace(/^\d+\.\s/, '');
-      result.push(`<li>${content}</li>`);
-    }
-    // Handle bullet points
-    else if (/^[•-]\s/.test(line)) {
-      if (!inBulletList) {
-        if (inNumberedList) { result.push('</ol>'); inNumberedList = false; }
-        result.push('<ul>');
-        inBulletList = true;
-      }
-      let content = line.replace(/^[•-]\s/, '');
-      result.push(`<li>${content}</li>`);
-    }
-    // Handle regular text
-    else if (line.length > 0) {
-      if (inNumberedList) { result.push('</ol>'); inNumberedList = false; }
-      if (inBulletList) { result.push('</ul>'); inBulletList = false; }
-      result.push(`<p>${line}</p>`);
-    }
-  }
+    // Handle bold/italic
+    .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/gim, "<em>$1</em>")
+    
+    // Convert line breaks to HTML breaks
+    .replace(/\n/g, "<br>");
+}
   
   // Close any open lists
   if (inNumberedList) result.push('</ol>');
