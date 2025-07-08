@@ -845,28 +845,29 @@
       }
 
 function formatMarkdown(text) {
-  return text
-    // Handle headers first
+  // First handle headers and formatting
+  let formatted = text
     .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
     .replace(/^### (.*$)/gim, "<h3>$1</h3>")
     .replace(/^## (.*$)/gim, "<h2>$1</h2>")
     .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-    
-    // Handle bold/italic
     .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/gim, "<em>$1</em>")
-    
-    // Handle paragraph breaks (double line breaks become proper paragraphs)
-    .replace(/\n\n+/g, "</p><p>")  // Double+ line breaks = new paragraphs
-    .replace(/\n/g, "<br>")        // Single line breaks = line breaks
-    
-    // Wrap everything in paragraph tags
-    .replace(/^(.)/gm, "<p>$1")    // Add opening <p> at start
-    .replace(/(.*)$/gm, "$1</p>")  // Add closing </p> at end
-    
-    // Clean up any double paragraph tags
-    .replace(/<\/p><p>/g, "</p>\n\n<p>")
-    .replace(/<p><\/p>/g, "");     // Remove empty paragraphs
+    .replace(/\*(.*?)\*/gim, "<em>$1</em>");
+  
+  // Split into paragraphs and wrap each in <p> tags
+  let paragraphs = formatted.split(/\n\s*\n/);  // Split on double line breaks
+  
+  return paragraphs
+    .filter(p => p.trim().length > 0)  // Remove empty paragraphs
+    .map(p => {
+      // If it's already a header, don't wrap in <p>
+      if (p.trim().startsWith('<h')) {
+        return p.trim();
+      }
+      // Otherwise wrap in paragraph tags
+      return `<p>${p.trim().replace(/\n/g, '<br>')}</p>`;
+    })
+    .join('\n\n');  // Add spacing between paragraphs
 }
       // Add initial greeting
       setTimeout(() => {
