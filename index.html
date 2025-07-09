@@ -844,15 +844,15 @@
         chat.scrollTop = chat.scrollHeight;
       }
 
-// 🔧 FIXED: More specific regex for numbered headings
+// 🔧 IMPROVED: Better handling of line breaks and spacing
 function formatMarkdown(text) {
   let result = text;
   
   // Handle headers FIRST (including ### with hashtags)
-  result = result.replace(/^#{4,6}\s+(.*$)/gim, '<h4>$1</h4>'); // #### to h4
-  result = result.replace(/^###\s+(.*$)/gim, '<h3>$1</h3>');     // ### to h3  
-  result = result.replace(/^##\s+(.*$)/gim, '<h2>$1</h2>');      // ## to h2
-  result = result.replace(/^#\s+(.*$)/gim, '<h1>$1</h1>');       // # to h1
+  result = result.replace(/^#{4,6}\s+(.*$)/gim, '<h4>$1</h4>'); 
+  result = result.replace(/^###\s+(.*$)/gim, '<h3>$1</h3>');      
+  result = result.replace(/^##\s+(.*$)/gim, '<h2>$1</h2>');       
+  result = result.replace(/^#\s+(.*$)/gim, '<h1>$1</h1>');        
   
   // Handle bold and italic
   result = result.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
@@ -864,64 +864,54 @@ function formatMarkdown(text) {
     '<a href="$&" target="_blank" rel="noopener noreferrer">$&</a>'
   );
   
-  // 🔧 FIXED: More specific pattern for numbered section headings
-  // Only match patterns that look like section headers, not regular sentences
+  // 🔧 FIXED: Handle numbered section headings with better spacing
   result = result.replace(
-    /(\d+\.\s+[A-Z][A-Za-z\s]*(?:Coverage|Details|Information|Requirements|Documentation|Evidence|Steps|Process|Review|Analysis|Summary|Conclusion|Action|Request|Appeal|Verification|Correction|Resubmission)[^.]*:)/g, 
-    '<br><br><strong>$1</strong><br>'
+    /(\d+\.\s+(?:Verification|Corrected|Supporting|Medical|Insurance|Appeal|Request|Documentation|Evidence|Review|Analysis|Summary|Claim|Details)[^.]*:)/g, 
+    '</p><p><strong>$1</strong></p><p>'
   );
   
-  // Handle numbered lists properly
-  const lines = result.split('\n');
-  const processedLines = [];
-  let inOrderedList = false;
+  // 🔧 NEW: Handle bullet points properly with consistent spacing
+  result = result.replace(/^[\s]*•[\s]+(.*$)/gim, '<li>$1</li>');
+  result = result.replace(/^[\s]*-[\s]+(.*$)/gim, '<li>$1</li>');
   
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const numberedMatch = line.match(/^(\d+)\.\s+(.*)$/);
-    
-    if (numberedMatch) {
-      if (!inOrderedList) {
-        processedLines.push('<ol>');
-        inOrderedList = true;
-      }
-      processedLines.push(`<li>${numberedMatch[2]}</li>`);
-    } else {
-      if (inOrderedList) {
-        processedLines.push('</ol>');
-        inOrderedList = false;
-      }
-      
-      // Handle unordered lists
-      if (line.match(/^[-*+]\s+(.*)$/)) {
-        const listItem = line.replace(/^[-*+]\s+/, '');
-        processedLines.push(`<ul><li>${listItem}</li></ul>`);
-      } else if (line.match(/^(step\s\d+.*)/i)) {
-        processedLines.push(`<h3>${line}</h3>`);
-      } else {
-        processedLines.push(line);
-      }
+  // 🔧 NEW: Wrap consecutive <li> items in <ul> tags
+  result = result.replace(/(<li>.*<\/li>)/gims, function(match) {
+    // Only wrap if not already wrapped
+    if (!match.includes('<ul>')) {
+      return '<ul>' + match + '</ul>';
     }
-  }
+    return match;
+  });
   
-  // Close any remaining ordered list
-  if (inOrderedList) {
-    processedLines.push('</ol>');
-  }
-  
-  result = processedLines.join('\n');
-  
-  // Handle special formatting for questions/offers at the end
+  // 🔧 NEW: Handle special closing phrases that should be separated
   result = result.replace(
-    /(Would you like (?:a letter|a call script|help|assistance)[^?]*\?)/gi,
-    '<br><br><strong>$1</strong>'
+    /(Sincerely,?\s*\[Your (?:Full )?Name\]|Thank you for your (?:prompt )?attention|I look forward to your reply|Would you like (?:any additional information|a letter|a call script|help)[^?]*\?)/gi,
+    '</p><p><strong>$1</strong></p><p>'
   );
   
-  // Convert newlines to <br>
-  result = result.replace(/\n/g, '<br>');
+  // Split into paragraphs properly
+  result = result
+    .split(/\n\s*\n/)  // Split on double line breaks
+    .map(paragraph => {
+      // Don't wrap if already has HTML tags
+      if (paragraph.includes('<') || paragraph.trim() === '') {
+        return paragraph;
+      }
+      return `<p>${paragraph.replace(/\n/g, '<br>')}</p>`;
+    })
+    .join('');
   
-  // Clean up multiple <br> tags
-  result = result.replace(/(<br>\s*){3,}/g, '<br><br>');
+  // Clean up empty paragraphs and fix nested issues
+  result = result
+    .replace(/<p><\/p>/g, '')                    // Remove empty paragraphs
+    .replace(/<p>(<h[1-6]>)/g, '$1')            // Don't wrap headers in paragraphs
+    .replace(/(<\/h[1-6]>)<\/p>/g, '$1')        // Don't wrap headers in paragraphs
+    .replace(/<p>(<ul>|<ol>)/g, '$1')           // Don't wrap lists in paragraphs
+    .replace(/(<\/ul>|<\/ol>)<\/p>/g, '$1')     // Don't wrap lists in paragraphs
+    .replace(/<p>(<strong>\d+\.)/g, '<p>$1')    // Fix numbered headings
+    .replace(/(<br>\s*){3,}/g, '<br><br>')      // Clean up excessive breaks
+    .replace(/<p><br>/g, '<p>')                 // Remove <br> at start of paragraphs
+    .replace(/<br><\/p>/g, '</p>');             // Remove <br> at end of paragraphs
   
   return result;
 }
