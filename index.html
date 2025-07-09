@@ -844,6 +844,7 @@
         chat.scrollTop = chat.scrollHeight;
       }
 
+// 🔧 FIXED: More specific regex for numbered headings
 function formatMarkdown(text) {
   let result = text;
   
@@ -863,9 +864,10 @@ function formatMarkdown(text) {
     '<a href="$&" target="_blank" rel="noopener noreferrer">$&</a>'
   );
   
-  // 🔧 NEW: Handle numbered headings that appear inline (like "1. Verification of Correct Insurance Coverage:")
+  // 🔧 FIXED: More specific pattern for numbered section headings
+  // Only match patterns that look like section headers, not regular sentences
   result = result.replace(
-    /(\d+\.\s+[A-Z][^:]*:)/g, 
+    /(\d+\.\s+[A-Z][A-Za-z\s]*(?:Coverage|Details|Information|Requirements|Documentation|Evidence|Steps|Process|Review|Analysis|Summary|Conclusion|Action|Request|Appeal|Verification|Correction|Resubmission)[^.]*:)/g, 
     '<br><br><strong>$1</strong><br>'
   );
   
@@ -923,7 +925,6 @@ function formatMarkdown(text) {
   
   return result;
 }
-
       // Add initial greeting
       setTimeout(() => {
         addMessage("Navigator", "Hello! I'm your Medical Bill Navigator. How can I help you today?", "bot");
