@@ -844,64 +844,25 @@
         chat.scrollTop = chat.scrollHeight;
       }
 
-// 🔧 ALTERNATIVE: More robust numbered list solution
-function formatMarkdownEnhanced(text) {
-  let result = text;
-  
-  // Handle headers
-  result = result.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-  result = result.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-  result = result.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-  
-  // Handle bold and italic
-  result = result.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-  result = result.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-  
-  // Handle numbered lists properly
-  const lines = result.split('\n');
-  const processedLines = [];
-  let inOrderedList = false;
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const numberedMatch = line.match(/^(\d+)\.\s+(.*)$/);
+function formatMarkdown(text) {
+  return text
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>') // Unordered list
     
-    if (numberedMatch) {
-      if (!inOrderedList) {
-        processedLines.push('<ol>');
-        inOrderedList = true;
-      }
-      processedLines.push(`<li>${numberedMatch[2]}</li>`);
-    } else {
-      if (inOrderedList) {
-        processedLines.push('</ol>');
-        inOrderedList = false;
-      }
-      
-      // Handle unordered lists
-      if (line.match(/^- (.*)$/)) {
-        processedLines.push(`<ul><li>${line.replace(/^- /, '')}</li></ul>`);
-      } else if (line.match(/^(step\s\d+.*)/i)) {
-        processedLines.push(`<h3>${line}</h3>`);
-      } else {
-        processedLines.push(line);
-      }
-    }
-  }
-  
-  // Close any remaining ordered list
-  if (inOrderedList) {
-    processedLines.push('</ol>');
-  }
-  
-  result = processedLines.join('\n');
-  
-  // Convert newlines to <br>
-  result = result.replace(/\n/g, '<br>');
-  
-  return result;
+    // 🔧 FIXED: Better numbered list handling
+    .replace(/^(\d+)\.\s+(.*)$/gim, '<li>$2</li>') // Convert numbered items to <li>
+    .replace(/(<li>.*<\/li>)/gims, (match) => {
+      // Wrap consecutive <li> items in <ol>
+      return `<ol>${match}</ol>`;
+    })
+    
+    .replace(/^(step\s\d+.*)/gim, '<h3>$1</h3>') // Step headings
+    .replace(/\n/g, '<br>');
 }
-
       // Add initial greeting
       setTimeout(() => {
         addMessage("Navigator", "Hello! I'm your Medical Bill Navigator. How can I help you today?", "bot");
