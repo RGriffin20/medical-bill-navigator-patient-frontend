@@ -844,71 +844,16 @@
         chat.scrollTop = chat.scrollHeight;
       }
 
-// 🔧 IMPROVED: Better handling of line breaks and spacing
-function formatMarkdown(text) {
-  let result = text;
-  
-  // Handle headers FIRST (including ### with hashtags)
-  result = result.replace(/^#{4,6}\s+(.*$)/gim, '<h4>$1</h4>'); 
-  result = result.replace(/^###\s+(.*$)/gim, '<h3>$1</h3>');      
-  result = result.replace(/^##\s+(.*$)/gim, '<h2>$1</h2>');       
-  result = result.replace(/^#\s+(.*$)/gim, '<h1>$1</h1>');        
-  
-  // Handle bold and italic
-  result = result.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-  result = result.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-  
-  // 🔧 FIXED: Handle numbered section headings with better spacing
-  result = result.replace(
-    /(\d+\.\s+(?:Verification|Corrected|Supporting|Medical|Insurance|Appeal|Request|Documentation|Evidence|Review|Analysis|Summary|Claim|Details)[^.]*:)/g, 
-    '</p><p><strong>$1</strong></p><p>'
-  );
-  
-  // 🔧 NEW: Handle bullet points properly with consistent spacing
-  result = result.replace(/^[\s]*•[\s]+(.*$)/gim, '<li>$1</li>');
-  result = result.replace(/^[\s]*-[\s]+(.*$)/gim, '<li>$1</li>');
-  
-  // 🔧 NEW: Wrap consecutive <li> items in <ul> tags
-  result = result.replace(/(<li>.*<\/li>)/gims, function(match) {
-    // Only wrap if not already wrapped
-    if (!match.includes('<ul>')) {
-      return '<ul>' + match + '</ul>';
-    }
-    return match;
-  });
-  
-  // 🔧 NEW: Handle special closing phrases that should be separated
-  result = result.replace(
-    /(Sincerely,?\s*\[Your (?:Full )?Name\]|Thank you for your (?:prompt )?attention|I look forward to your reply|Would you like (?:any additional information|a letter|a call script|help)[^?]*\?)/gi,
-    '</p><p><strong>$1</strong></p><p>'
-  );
-  
-  // Split into paragraphs properly
-  result = result
-    .split(/\n\s*\n/)  // Split on double line breaks
-    .map(paragraph => {
-      // Don't wrap if already has HTML tags
-      if (paragraph.includes('<') || paragraph.trim() === '') {
-        return paragraph;
+     function formatMarkdown(text) {
+        return text
+          .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+          .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+          .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+          .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/gim, "<em>$1</em>")
+          .replace(/^- (.*$)/gim, "<ul><li>$1</li></ul>")
+          .replace(/\n/g, "<br>");
       }
-      return `<p>${paragraph.replace(/\n/g, '<br>')}</p>`;
-    })
-    .join('');
-  
-  // Clean up empty paragraphs and fix nested issues
-  result = result
-    .replace(/<p><\/p>/g, '')                    // Remove empty paragraphs
-    .replace(/<p>(<h[1-6]>)/g, '$1')            // Don't wrap headers in paragraphs
-    .replace(/(<\/h[1-6]>)<\/p>/g, '$1')        // Don't wrap headers in paragraphs
-    .replace(/<p>(<ul>|<ol>)/g, '$1')           // Don't wrap lists in paragraphs
-    .replace(/(<\/ul>|<\/ol>)<\/p>/g, '$1')     // Don't wrap lists in paragraphs
-    .replace(/<p>(<strong>\d+\.)/g, '<p>$1')    // Fix numbered headings
-    .replace(/(<br>\s*){3,}/g, '<br><br>')      // Clean up excessive breaks
-    .replace(/<p><br>/g, '<p>')                 // Remove <br> at start of paragraphs
-    .replace(/<br><\/p>/g, '</p>');             // Remove <br> at end of paragraphs
-  
-  return result;
-}
       // Add initial greeting
       setTimeout(() => {
         addMessage("Navigator", "Hello! I'm your Medical Bill Navigator. How can I help you today?", "bot");
