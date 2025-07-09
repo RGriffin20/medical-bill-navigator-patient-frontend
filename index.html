@@ -844,31 +844,101 @@
         chat.scrollTop = chat.scrollHeight;
       }
 
-// 🔧 ALTERNATIVE: If you want to keep your existing function and just add fixes
-function formatMarkdown(text) {
-  return text
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')    // Fix: ### headers
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+function formatMarkdownEnhanced(text) {
+  let result = text;
+  
+  // Handle headers FIRST (including ### with hashtags)
+  result = result.replace(/^#{4,6}\s+(.*$)/gim, '<h4>$1</h4>'); // #### to h4
+  result = result.replace(/^###\s+(.*$)/gim, '<h3>$1</h3>');     // ### to h3  
+  result = result.replace(/^##\s+(.*$)/gim, '<h2>$1</h2>');      // ## to h2
+  result = result.replace(/^#\s+(.*$)/gim, '<h1>$1</h1>');       // # to h1
+  
+  // Handle bold and italic
+  result = result.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+  result = result.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+  
+  // Handle URLs - convert to clickable links
+  result = result.replace(
+    /https?:\/\/[^\s<>"{}|\\^`[\]]+/gi, 
+    '<a href="$&" target="_blank" rel="noopener noreferrer">$&</a>'
+  );
+  
+  // 🔧 NEW: Handle numbered headings that appear inline (like "1. Verification of Correct Insurance Coverage:")
+  result = result.replace(
+    /(\d+\.\s+[A-Z][^:]*:)/g, 
+    '<br><br><strong>$1</strong><br>'
+  );
+  
+  // Handle numbered lists properly
+  const lines = result.split('\n');
+  const processedLines = [];
+  let inOrderedList = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const numberedMatch = line.match(/^(\d+)\.\s+(.*)$/);
     
-    // Fix: Convert URLs to clickable links
-    .replace(/https?:\/\/[^\s<>"{}|\\^`[\]]+/gi, '<a href="$&" target="_blank">$&</a>')
-    
-    .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>')
-    .replace(/^(\d+)\.\s+(.*)$/gim, '<numbereditem>$2</numbereditem>')
-    .replace(/(<numbereditem>.*<\/numbereditem>)/gims, '<ol>$1</ol>')
-    .replace(/<numbereditem>/g, '<li>')
-    .replace(/<\/numbereditem>/g, '</li>')
-    .replace(/^(step\s\d+.*)/gim, '<h3>$1</h3>')
-    
-    // Fix: Handle end-of-message questions/offers
-    .replace(/(Would you like (?:a letter|a call script|help|assistance)[^?]*\?)/gi, '<br><br><strong>$1</strong>')
-    
-    .replace(/\n/g, '<br>');
+    if (numberedMatch) {
+      if (!inOrderedList) {
+        processedLines.push('<ol>');
+        inOrderedList = true;
+      }
+      processedLines.push(`<li>${numberedMatch[2]}</li>`);
+    } else {
+      if (inOrderedList) {
+        processedLines.push('</ol>');
+        inOrderedList = false;
+      }
+      
+      // Handle unordered lists
+      if (line.match(/^[-*+]\s+(.*)$/)) {
+        const listItem = line.replace(/^[-*+]\s+/, '');
+        processedLines.push(`<ul><li>${listItem}</li></ul>`);
+      } else if (line.match(/^(step\s\d+.*)/i)) {
+        processedLines.push(`<h3>${line}</h3>`);
+      } else {
+        processedLines.push(line);
+      }
+    }
+  }
+  
+  // Close any remaining ordered list
+  if (inOrderedList) {
+    processedLines.push('</ol>');
+  }
+  
+  result = processedLines.join('\n');
+  
+  // Handle special formatting for questions/offers at the end
+  result = result.replace(
+    /(Would you like (?:a letter|a call script|help|assistance)[^?]*\?)/gi,
+    '<br><br><strong>$1</strong>'
+  );
+  
+  // Convert newlines to <br>
+  result = result.replace(/\n/g, '<br>');
+  
+  // Clean up multiple <br> tags
+  result = result.replace(/(<br>\s*){3,}/g, '<br><br>');
+  
+  return result;
 }
-      // Add initial greeting
+
+// 🔧 ALTERNATIVE: Simple fix to add to your existing function
+// Just add this line BEFORE your numbered list processing:
+
+// Fix inline numbered headings (like "1. Verification of Correct Insurance Coverage:")
+result = result.replace(/(\d+\.\s+[A-Z][^:]*:)/g, '<br><br><strong>$1</strong><br>');
+
+// This regex matches:
+// - \d+ = one or more digits
+// - \.\s+ = period followed by space(s)
+// - [A-Z] = starts with capital letter  
+// - [^:]* = any characters except colon
+// - : = ends with colon
+// And wraps it in line breaks and bold formatting      
+
+// Add initial greeting
       setTimeout(() => {
         addMessage("Navigator", "Hello! I'm your Medical Bill Navigator. How can I help you today?", "bot");
       }, 500);
