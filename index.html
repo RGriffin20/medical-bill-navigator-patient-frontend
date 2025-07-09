@@ -858,12 +858,6 @@ function formatMarkdown(text) {
   result = result.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
   result = result.replace(/\*(.*?)\*/gim, '<em>$1</em>');
   
-  // Handle URLs - convert to clickable links
-  result = result.replace(
-    /https?:\/\/[^\s<>"{}|\\^`[\]]+/gi, 
-    '<a href="$&" target="_blank" rel="noopener noreferrer">$&</a>'
-  );
-  
   // 🔧 FIXED: Handle numbered section headings with better spacing
   result = result.replace(
     /(\d+\.\s+(?:Verification|Corrected|Supporting|Medical|Insurance|Appeal|Request|Documentation|Evidence|Review|Analysis|Summary|Claim|Details)[^.]*:)/g, 
