@@ -852,7 +852,15 @@ function formatMarkdown(text) {
     .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em>$1</em>')
     .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>') // Unordered list
-    .replace(/^(\d+)\. (.*$)/gim, '<ol><li>$2</li></ol>') // Ordered list
+    .replace(/(^(\d+)\. .*(\n(\d+)\. .*)*)/gim, (match, list) => {
+      let html = '<ol>';
+      list.split('\n').forEach(item => {
+        html += `<li>${item.replace(/^\d+\. /, '')}</li>`;
+      });
+      html += '</ol>';
+      return html;
+    })
+    .replace(/^(step\s\d+.*)/gim, '<h3>$1</h3>') // New: Step headings
     .replace(/\n/g, '<br>');
 }
 
