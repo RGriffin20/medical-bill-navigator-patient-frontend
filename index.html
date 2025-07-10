@@ -853,6 +853,7 @@
           .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
           .replace(/\*(.*?)\*/gim, "<em>$1</em>")
           .replace(/^- (.*$)/gim, "<ul><li>$1</li></ul>")
+          .replace(/^\d+\. (.*$)/gim, "<ol><li>$1</li></ol>")
           .replace(/\n/g, "<br>");
       }
       // Add initial greeting
